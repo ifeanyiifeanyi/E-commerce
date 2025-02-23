@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\AdminProfileController;
-use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\Vendor\VendorController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Vendor\VendorController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\AdminProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,6 +41,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::put('update/{brand}', 'update')->name('brands.update');
         Route::delete('destroy/{brand}/brand', 'destroy')->name('brands.destroy');
         Route::patch('status/{brand}/toggle', 'toggleStatus')->name('brands.toggle-status');
+    });
+
+    Route::controller(CategoryController::class)->group(function(){
+        Route::get('categories', 'index')->name('categories');
+        Route::get('create/category', 'create')->name('categories.create');
+        Route::post('category/store', 'store')->name('categories.store');
+        Route::put('category/{category}', 'update')->name('categories.update');
+        Route::delete('category/{category}/destroy', 'destroy')->name('categories.destroy');
     });
 });
 

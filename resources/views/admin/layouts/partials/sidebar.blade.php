@@ -2,22 +2,11 @@
 
     <div data-simplebar class="h-100">
 
-        <!-- User details -->
-        <div class="mt-3 text-center user-profile">
-            <div class="">
-                <img src="/adminsrc/assets/images/users/avatar-1.jpg" alt="" class="avatar-md rounded-circle">
-            </div>
-            <div class="mt-3">
-                <h4 class="mb-1 font-size-16">Julia Hudda</h4>
-                <span class="text-muted"><i class="align-middle ri-record-circle-line font-size-14 text-success"></i> Online</span>
-            </div>
-        </div>
 
         <!--- Sidemenu -->
         <div id="sidebar-menu">
             <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
-                <li class="menu-title">Menu</li>
 
                 <li>
                     <a href="{{ route('admin.dashboard') }}" class="waves-effect">
@@ -40,29 +29,21 @@
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="ri-layout-3-line"></i>
-                        <span>Layouts</span>
+                        <span>Categories</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="true">
                         <li>
-                            <a href="javascript: void(0);" class="has-arrow">Vertical</a>
+                            <a href="javascript: void(0);" class="has-arrow">Category</a>
                             <ul class="sub-menu" aria-expanded="true">
-                                <li><a href="layouts-dark-sidebar.html">Dark Sidebar</a></li>
-                                <li><a href="layouts-compact-sidebar.html">Compact Sidebar</a></li>
-                                <li><a href="layouts-icon-sidebar.html">Icon Sidebar</a></li>
-                                <li><a href="layouts-boxed.html">Boxed Layout</a></li>
-                                <li><a href="layouts-preloader.html">Preloader</a></li>
-                                <li><a href="layouts-colored-sidebar.html">Colored Sidebar</a></li>
+                                <li><a href="{{ route('admin.categories') }}">View Categories</a></li>
+                                <li><a href="{{ route('admin.categories.create') }}">Create Category</a></li>
                             </ul>
                         </li>
 
                         <li>
-                            <a href="javascript: void(0);" class="has-arrow">Horizontal</a>
+                            <a href="javascript: void(0);" class="has-arrow">Sub Category</a>
                             <ul class="sub-menu" aria-expanded="true">
                                 <li><a href="layouts-horizontal.html">Horizontal</a></li>
-                                <li><a href="layouts-hori-topbar-light.html">Topbar light</a></li>
-                                <li><a href="layouts-hori-boxed-width.html">Boxed width</a></li>
-                                <li><a href="layouts-hori-preloader.html">Preloader</a></li>
-                                <li><a href="layouts-hori-colored-header.html">Colored Header</a></li>
                             </ul>
                         </li>
                     </ul>
