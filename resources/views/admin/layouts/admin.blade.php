@@ -64,8 +64,6 @@
 
                                 <div class="page-title-right">
                                     <ol class="m-0 breadcrumb">
-                                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a>
-                                        </li>
                                         @hasSection('breadcrumb-parent')
                                             <li class="breadcrumb-item">
                                                 <a href="@yield('breadcrumb-parent-route')">@yield('breadcrumb-parent')</a>

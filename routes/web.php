@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\UserController;
@@ -29,6 +30,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::post('/profile/photo', 'updatePhoto')->name('profile.photo');
         Route::delete('/profile/photo', 'deletePhoto')->name('profile.photo.delete');
         Route::delete('/profile/sessions', 'logoutSession')->name('profile.logout-session');
+    });
+
+    Route::controller(BrandController::class)->group(function(){
+        Route::get('brands', 'index')->name('brands');
+        Route::get('create', 'create')->name('brands.create');
+        Route::post('store', 'store')->name('brands.store');
+        Route::get('edit/{brand}', 'edit')->name('brands.edit');
+        Route::put('update/{brand}', 'update')->name('brands.update');
+        Route::delete('destroy/{brand}/brand', 'destroy')->name('brands.destroy');
+        Route::patch('status/{brand}/toggle', 'toggleStatus')->name('brands.toggle-status');
     });
 });
 
