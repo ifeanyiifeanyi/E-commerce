@@ -36,14 +36,13 @@
                             <a href="javascript: void(0);" class="has-arrow">Category</a>
                             <ul class="sub-menu" aria-expanded="true">
                                 <li><a href="{{ route('admin.categories') }}">View Categories</a></li>
-                                <li><a href="{{ route('admin.categories.create') }}">Create Category</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a href="javascript: void(0);" class="has-arrow">Sub Category</a>
                             <ul class="sub-menu" aria-expanded="true">
-                                <li><a href="layouts-horizontal.html">Horizontal</a></li>
+                                <li><a href="{{ route('admin.subcategories') }}">View Sub Categories</a></li>
                             </ul>
                         </li>
                     </ul>

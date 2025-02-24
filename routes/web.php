@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
 
 Route::get('/', function () {
@@ -45,10 +46,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
     Route::controller(CategoryController::class)->group(function(){
         Route::get('categories', 'index')->name('categories');
-        Route::get('create/category', 'create')->name('categories.create');
         Route::post('category/store', 'store')->name('categories.store');
         Route::put('category/{category}', 'update')->name('categories.update');
         Route::delete('category/{category}/destroy', 'destroy')->name('categories.destroy');
+    });
+
+    Route::controller(SubcategoryController::class)->group(function(){
+        Route::get('subcategories', 'index')->name('subcategories');
+        Route::post('subcategory/store', 'store')->name('subcategories.store');
+        Route::put('subcategory/{subcategory}', 'update')->name('subcategories.update');
+        Route::delete('subcategory/{subcategory}/destroy', 'destroy')->name('subcategories.destroy');
     });
 });
 

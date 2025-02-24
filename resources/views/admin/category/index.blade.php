@@ -26,10 +26,15 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {{-- @dd($categories) --}}
                         @forelse($categories as $category)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $category->name }}</td>
+                                <td>
+                                    {{ $category->name }}
+                                    &nbsp;
+                                    <small class="badge bg-primary">{{ $category->subcategories_count }}</small>
+                                </td>
                                 <td>{{ Str::limit($category->description, 50) }}</td>
 
                                 <td>
