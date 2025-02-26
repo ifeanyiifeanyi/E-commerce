@@ -10,6 +10,7 @@ use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Vendor\VendorProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -65,6 +66,17 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
     Route::controller(VendorController::class)->group(function(){
         Route::get('dashboard', 'dashboard')->name('dashboard');
         Route::get('logout', 'logout')->name('logout');
+    });
+
+    Route::controller(VendorProfileController::class)->group(function(){
+        Route::get('profile', 'index')->name('profile');
+        Route::put('update-profile', 'update')->name('profile.update');
+        Route::put('password', 'updatePassword')->name('profile.password');
+
+        Route::post('/profile/photo', 'updatePhoto')->name('profile.photo');
+        Route::delete('/profile/photo', 'deletePhoto')->name('profile.photo.delete');
+
+        Route::delete('/profile/sessions', 'destroySession')->name('sessions.destroy');
     });
 });
 

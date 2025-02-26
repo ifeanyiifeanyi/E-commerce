@@ -7,29 +7,29 @@
     <title>{{ config('app.name', 'Laravel') }} | @yield('title')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesdesign" name="author" />
+    <meta content="{{ config('app.name', 'Laravel') }}" name="author" />
     <!-- App favicon -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="/adminsrc/assets/images/favicon.ico">
+    <link rel="shortcut icon" href="{{ asset('adminsrc/assets/images/favicon.ico') }}">
 
     <!-- DataTables -->
-    <link href="/adminsrc/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet"
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-    <link href="/adminsrc/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet"
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-    <link href="/adminsrc/assets/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet"
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
 
     <!-- Responsive datatable examples -->
-    <link href="/adminsrc/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet"
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
 
     <!-- Bootstrap Css -->
-    <link href="/adminsrc/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('adminsrc/assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
-    <link href="/adminsrc/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('adminsrc/assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- App Css-->
-    <link href="/adminsrc/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('adminsrc/assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     {{-- Add SweetAlert2 CSS --}}
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     @yield('css')
@@ -104,36 +104,36 @@
     <div class="rightbar-overlay"></div>
 
     <!-- JAVASCRIPT -->
-    <script src="/adminsrc/assets/libs/jquery/jquery.min.js"></script>
-    <script src="/adminsrc/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/adminsrc/assets/libs/metismenu/metisMenu.min.js"></script>
-    <script src="/adminsrc/assets/libs/simplebar/simplebar.min.js"></script>
-    <script src="/adminsrc/assets/libs/node-waves/waves.min.js"></script>
+    <script src="{{ asset('adminsrc/assets/libs/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/metismenu/metisMenu.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/node-waves/waves.min.js') }}"></script>
 
     <!-- Required datatable js -->
-    <script src="/adminsrc/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <!-- Buttons examples -->
-    <script src="/adminsrc/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
-    <script src="/adminsrc/assets/libs/jszip/jszip.min.js"></script>
-    <script src="/adminsrc/assets/libs/pdfmake/build/pdfmake.min.js"></script>
-    <script src="/adminsrc/assets/libs/pdfmake/build/vfs_fonts.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-buttons/js/buttons.print.min.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/jszip/jszip.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/pdfmake/build/pdfmake.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/pdfmake/build/vfs_fonts.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
 
-    <script src="/adminsrc/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-select/js/dataTables.select.min.js') }}"></script>
 
     <!-- Responsive examples -->
-    <script src="/adminsrc/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="/adminsrc/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
 
     <!-- Datatable init js -->
-    <script src="/adminsrc/assets/js/pages/datatables.init.js"></script>
+    <script src="{{ asset('adminsrc/assets/js/pages/datatables.init.js') }}"></script>
 
-    <script src="/adminsrc/assets/js/app.js"></script>
+    <script src="{{ asset('adminsrc/assets/js/app.js') }}"></script>
     {{-- Add SweetAlert2 JS --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
