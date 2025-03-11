@@ -78,7 +78,7 @@
                         <!-- item-->
                         <a href="auth-lock-screen.html" class="dropdown-item notify-item">
                             <i class="align-middle mdi mdi-lock-outline fs-16"></i>
-                            <span>Lock Screen</span>
+                            <span>2FA</span>
                         </a>
 
                         <div class="dropdown-divider"></div>

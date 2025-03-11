@@ -20,6 +20,9 @@ class DashboardController extends Controller
                 return redirect(route('user.dashboard', absolute: false));
                 break;
             case 'vendor':
+                if ($request->user()->status === 'inactive') {
+                    return view('auth.vendor-pending-approval');
+                }
                 return redirect(route('vendor.dashboard', absolute: false));
                 break;
             default:

@@ -10,9 +10,11 @@
                 <div class="page-links">
                     <a href="{{ route('login') }}">Login</a><a href="{{ route('register') }}" class="active">Register</a>
                 </div>
+
+                
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
-                    <div class="form-group mb-3">
+                    <div class="mb-3 form-group">
                         <input class="form-control" type="text" name="name" placeholder="Full Name" required
                             value="{{ old('name') }}">
                         @error('name')
@@ -34,6 +36,8 @@
                         <button id="submit" type="submit" class="ibtn">Register</button>
                     </div>
                 </form>
+
+
                 <div class="other-links">
                     <span>Or register with</span><a href="#">Facebook</a><a href="#">Google</a><a
                         href="#">Linkedin</a>
