@@ -81,4 +81,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->photo ? asset($this->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
     }
+
+    // Add this to your User model
+    public function documents()
+    {
+        return $this->hasMany(VendorDocument::class);
+    }
+
+    public function isVendor(): bool
+    {
+        return $this->role === 'vendor';
+    }
 }

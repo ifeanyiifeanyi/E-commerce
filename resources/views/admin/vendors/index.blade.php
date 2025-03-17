@@ -43,7 +43,9 @@
                                 @forelse ($vendors as $vendor)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $vendor->name }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.vendors.show', $vendor) }}" title="View Vendor Details" class="link fw-semibold">{{ $vendor->name }} <small><i class="fas fa-id-card"></i></small></a>
+                                        </td>
                                         <td>{{ $vendor->email }}</td>
                                         <td>{{ $vendor->phone }}</td>
                                         <td>
@@ -79,6 +81,7 @@
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
+                                            <a href="{{ route('admin.vendors.edit', $vendor) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
                                         </td>
                                     </tr>
                                 @empty

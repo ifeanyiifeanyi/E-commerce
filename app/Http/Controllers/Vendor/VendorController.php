@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
+use view;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class VendorController extends Controller
 {

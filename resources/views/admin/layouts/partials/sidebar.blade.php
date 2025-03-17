@@ -57,6 +57,7 @@
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('admin.vendors') }}">Vendors</a></li>
+                        <li><a href="{{ route('admin.create.vendors') }}">Create Vendor</a></li>
                     </ul>
                 </li>
 

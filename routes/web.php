@@ -99,9 +99,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
     Route::controller(VendorManagementController::class)->group(function(){
         Route::get('vendors', 'index')->name('vendors');
+        Route::get('vendors/{user}', 'showVendor')->name('vendors.show');
         Route::patch('vendor/approve/{user}', 'approveVendor')->name('vendors.approve');
         Route::patch('vendor/deactivate/{user}', 'deactivateVendor')->name('vendors.deactivate');
         Route::delete('vendor/delete/{user}', 'deleteVendor')->name('vendors.delete');
+
+        Route::get('vendor/create', 'createVendor')->name('create.vendors');
+        Route::post('store/vendor', 'storeVendor')->name('vendors.store');
+        Route::get('vendor/edit/{user}', 'editVendor')->name('vendors.edit');
+        Route::put('vendor/update/{user}', 'updateVendor')->name('vendors.update');
 
     });
 });
