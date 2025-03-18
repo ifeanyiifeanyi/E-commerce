@@ -82,6 +82,7 @@
                                                 </button>
                                             </form>
                                             <a href="{{ route('admin.vendors.edit', $vendor) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                            <a href="{{ route('admin.vendors.documents', $vendor) }}" class="btn btn-sm btn-primary"><i class="fas fa-folder-open"></i></a>
                                         </td>
                                     </tr>
                                 @empty

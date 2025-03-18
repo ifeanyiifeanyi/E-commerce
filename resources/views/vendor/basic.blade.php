@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard')
 
-@section('vendor-content')
+@section('vendor')
 
 
 @endsection

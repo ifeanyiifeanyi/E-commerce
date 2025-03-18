@@ -10,10 +10,12 @@ use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
-use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Vendor\VendorDocumentController;
+use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Auth\VendorRegistrationController;
+use App\Http\Controllers\Admin\ManageVendorDocumentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -110,6 +112,20 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::put('vendor/update/{user}', 'updateVendor')->name('vendors.update');
 
     });
+
+    Route::controller(ManageVendorDocumentController::class)->group(function(){
+        Route::get('vendor/documents/{user?}', 'index')->name('vendors.documents');
+        Route::get('vendor/documents/{user}/create', 'create')->name('vendors.documents.create');
+
+        Route::get('vendor/{user}/{document}/show', 'show')->name('vendors.documents.show');
+        Route::patch('vendor/{user}/{document}/approve', 'approve')->name('vendors.documents.approve');
+        Route::patch('vendor/{user}/{document}/reject', 'reject')->name('vendors.documents.reject');
+        Route::get('vendor/{user}/{document}/delete', 'delete')->name('vendors.documents.destroy');
+
+
+        Route::post('vendor/documents/{user}', 'store')->name('vendors.documents.store');
+
+    });
 });
 
 
@@ -129,6 +145,15 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::delete('/profile/photo', 'deletePhoto')->name('profile.photo.delete');
 
         Route::delete('/profile/sessions', 'destroySession')->name('sessions.destroy');
+    });
+
+    Route::controller(VendorDocumentController::class)->group(function(){
+        Route::get('verified-documents', 'index')->name('documents');
+        Route::get('create-documents', 'create')->name('documents.create');
+        Route::post('store-documents', 'store')->name('documents.store');
+        Route::get('verified-documents/{document}/show', 'show')->name('documents.show');
+        Route::delete('verified-documents/{document}/delete', 'destroy')->name('documents.destroy');
+
     });
 });
 
