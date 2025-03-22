@@ -16,6 +16,8 @@ use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Auth\VendorRegistrationController;
 use App\Http\Controllers\Admin\ManageVendorDocumentController;
+use App\Http\Controllers\Admin\ProductController;
+use GuzzleHttp\Promise\Create;
 
 Route::get('/', function () {
     return view('welcome');
@@ -124,6 +126,27 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
 
         Route::post('vendor/documents/{user}', 'store')->name('vendors.documents.store');
+    });
+
+    Route::controller(ProductController::class)->group(function () {
+
+        Route::get('products', 'index')->name('products');
+        Route::get('products/create', 'create')->name('products.create');
+        Route::post('products/store', 'store')->name('products.store');
+        Route::get('products/{product}/show', 'show')->name('products.show');
+        Route::get('products/{product}/edit', 'edit')->name('products.edit');
+        Route::put('products/{product}/update', 'update')->name('products.update');
+        Route::delete('products/{product}/delete', 'destroy')->name('products.destroy');
+
+        Route::get('get-subcategories', 'getSubcategories')->name('get.subcategories');
+        Route::get('get-category', 'getCategories')->name('get.categories');
+
+         // Delete multi-image
+        Route::delete('/product-multi-image/{id}', 'deleteMultiImage')->name('product.delete.multi-image');
+
+        Route::get('get-brands', 'getBrands')->name('get.brands');
+        Route::get('get-vendors', 'getVendors')->name('get.vendors');
+        Route::get('get-vendor-documents', 'getVendorDocuments')->name('get.vendor.documents');
 
     });
 });

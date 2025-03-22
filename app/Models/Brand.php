@@ -24,6 +24,11 @@ class Brand extends Model
         'is_featured' => 'boolean',
     ];
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
 
     public function scopeActive($query)
     {
