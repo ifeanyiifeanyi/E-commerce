@@ -32,12 +32,7 @@ class ProductUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique('products')->ignore($this->product),
             ],
-            'product_code' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('products')->ignore($this->product),
-            ],
+           
             'product_qty' => 'required|integer|min:0',
             'product_tags' => 'nullable|string',
             'product_size' => 'nullable|string',

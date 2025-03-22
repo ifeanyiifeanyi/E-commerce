@@ -5,15 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Subcategory;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use App\Models\ProductMultiImage;
 use App\Http\Controllers\Controller;
+use App\Services\ProductCodeGenerator;
 use App\Http\Requests\ProductStoreRequest;
+use App\Http\Requests\ProductUpdateRequest;
 
 class ProductController extends Controller
 {
-    public function __construct(private ProductService $productService) {}
+
+    public function __construct(private ProductService $productService, private ProductCodeGenerator $productCodeGenerator) {}
 
     public function index()
     {
@@ -21,7 +25,6 @@ class ProductController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('admin.products.index', compact('products'));
         return view('admin.products.index', compact('products'));
     }
 
@@ -55,7 +58,17 @@ class ProductController extends Controller
 
     public function store(ProductStoreRequest $request)
     {
+
         $validated = $request->validated();
+
+        // Generate unique product code if not provided
+
+        $validated['product_code'] = ProductCodeGenerator::generate(
+            $request->vendor_id ?? null,
+            $validated['category_id'],
+            true // Set isAdmin to true since this is the admin controller
+        );
+
 
         // Create files array manually
         $files = [
@@ -80,13 +93,20 @@ class ProductController extends Controller
     {
         $brands = Brand::active()->get();
         $categories = Category::all();
+        $subcategories = Subcategory::all();
 
-        return view('admin.products.edit', compact('product', 'brands', 'categories'));
+        return view('admin.products.edit', compact('product', 'brands', 'categories', 'subcategories'));
     }
 
-    public function update(ProductStoreRequest $request, Product $product)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
         $validated = $request->validated();
+
+        $validated['product_code'] = ProductCodeGenerator::generate(
+            $request->vendor_id ?? null,
+            $validated['category_id'],
+            true // Set isAdmin to true since this is the admin controller
+        );
 
         // Update product using the service
         $this->productService->updateProduct(
@@ -100,11 +120,47 @@ class ProductController extends Controller
             ->with('success', 'Product updated successfully');
     }
 
+
+
     public function deleteMultiImage(int $imageId)
     {
         $image = ProductMultiImage::findOrFail($imageId);
         $this->productService->deleteMultiImage($image);
 
         return redirect()->back()->with('success', 'Image deleted successfully');
+    }
+
+
+    public function destroy(Product $product)
+    {
+        $this->productService->deleteProduct($product);
+
+        return redirect()
+            ->route('admin.products')
+            ->with('success', 'Product deleted successfully');
+    }
+
+
+
+    /**
+     * Toggle product status (active/inactive)
+     */
+    public function toggleStatus(Request $request, Product $product)
+    {
+        // Validate request
+        $request->validate([
+            'status' => 'required|boolean'
+        ]);
+
+        // Update product status
+        $product->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product status updated successfully',
+            'status' => $product->status
+        ]);
     }
 }

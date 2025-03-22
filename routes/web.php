@@ -143,6 +143,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
          // Delete multi-image
         Route::delete('/product-multi-image/{id}', 'deleteMultiImage')->name('product.delete.multi-image');
+        Route::post('products/{product}/toggle-status',  'toggleStatus')->name('admin.products.toggle-status');
+
 
         Route::get('get-brands', 'getBrands')->name('get.brands');
         Route::get('get-vendors', 'getVendors')->name('get.vendors');

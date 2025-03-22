@@ -22,7 +22,7 @@
                                 <h6 class="mb-3">Basic Information</h6>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mt-4 mb-3">
                                 <label for="product_name" class="form-label">Product Name <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('product_name') is-invalid @enderror"
@@ -32,15 +32,6 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="product_code" class="form-label">Product Code <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('product_code') is-invalid @enderror"
-                                    id="product_code" name="product_code" value="{{ old('product_code') }}" required>
-                                @error('product_code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
 
                             <div class="col-md-4 mb-3">
                                 <label for="brand_id" class="form-label">Brand <span class="text-danger">*</span></label>
@@ -361,7 +352,7 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         $('#thumbnail-preview').html('<img src="' + e.target.result +
-                            '" class="img-fluid mt-2" style="max-height: 200px">');
+                            '" class="img-fluid mt-2 img-thumbnail" style="max-height: 100px">');
                     }
                     reader.readAsDataURL(file);
                 }

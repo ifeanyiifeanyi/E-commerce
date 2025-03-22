@@ -227,6 +227,18 @@ class ProductService
     }
 
 
+      /**
+     * Delete a product and all its associated images
+     */
+    public function deleteProduct(Product $product)
+    {
+        // First delete all associated images
+        $this->deleteProductImages($product);
+
+        // Then delete the product itself
+        return $product->delete();
+    }
+
     /**
      * Delete product images
      */
