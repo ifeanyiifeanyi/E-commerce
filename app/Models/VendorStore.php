@@ -33,6 +33,7 @@ class VendorStore extends Model
         'bank_account_name',
         'is_featured',
         'status',
+        'rejection_reason',
         'join_date',
         'meta_title',
         'meta_description',
@@ -43,7 +44,7 @@ class VendorStore extends Model
     protected $casts = [
         'join_date' => 'datetime',
         'is_featured' => 'boolean',
-        'status' => 'boolean',
+        'status' => 'string',
     ];
 
     public function vendor()
@@ -51,9 +52,36 @@ class VendorStore extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function documents()
+    {
+        return $this->hasOneThrough(
+            VendorDocument::class,
+            User::class,
+            'id', // Foreign key on the User table
+            'user_id', // Foreign key on the VendorDocument table
+            'user_id', // Local key on the VendorStore table
+            'id' // Local key on the User table
+        );
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class, 'vendor_id', 'user_id');
+    }
+
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+    
+    public function isApproved()
+    {
+        return $this->status === 'approved';
+    }
+    
+    public function isRejected()
+    {
+        return $this->status === 'rejected';
     }
 
     // public function reviews()
@@ -61,8 +89,8 @@ class VendorStore extends Model
     //     return $this->hasMany(Review::class, 'vendor_id', 'user_id');
     // }
 
-    public function getAverageRatingAttribute()
-    {
-        return $this->reviews()->avg('rating') ?: 0;
-    }
+    // public function getAverageRatingAttribute()
+    // {
+    //     return $this->reviews()->avg('rating') ?: 0;
+    // }
 }

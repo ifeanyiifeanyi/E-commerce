@@ -23,7 +23,6 @@
                             <th>Image</th>
                             <th>Name</th>
                             <th>Code</th>
-                            <th>Category</th>
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Status</th>
@@ -41,7 +40,6 @@
                                 </td>
                                 <td>{{ Str::limit($product->product_name, 20) }}</td>
                                 <td>{{ $product->product_code }}</td>
-                                <td>{{ $product->category->name ?? 'N/A' }}</td>
                                 <td>
                                     @if ($product->discount_price)
                                         <span class="text-decoration-line-through text-muted">

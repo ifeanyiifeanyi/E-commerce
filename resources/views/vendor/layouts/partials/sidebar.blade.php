@@ -35,19 +35,48 @@
                     </a>
                 </li>
 
+               
+
+
                 <li>
-                    <a href="widgets.html">
-                        <i data-feather="aperture"></i>
-                        <span> Products </span>
+                    <a href="#store" data-bs-toggle="collapse">
+                        <i data-feather="shopping-bag"></i>
+                        <span> My Store </span>
+                        <span class="menu-arrow"></span>
                     </a>
+                    <div class="collapse" id="store">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a href="{{ route('vendor.stores.show') }}">Store Details</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('vendor.stores') }}">Update Details</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
-
-
-
+                <li>
+                    <a href="#product" data-bs-toggle="collapse">
+                        <i data-feather="database"></i>
+                        <span> Products </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="product">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a href="">View Products</a>
+                            </li>
+                            <li>
+                                <a href="">Create Product</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+               
                 <li>
                     <a href="#sidebarAuth" data-bs-toggle="collapse">
-                        <i data-feather="users"></i>
+                        <i data-feather="folder-plus"></i>
                         <span> Verification Documents </span>
                         <span class="menu-arrow"></span>
                     </a>

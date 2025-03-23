@@ -1,23 +1,24 @@
 <?php
 
+use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Vendor\VendorStoreController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Auth\VendorRegistrationController;
 use App\Http\Controllers\Admin\ManageVendorDocumentController;
-use App\Http\Controllers\Admin\ProductController;
-use GuzzleHttp\Promise\Create;
 
 Route::get('/', function () {
     return view('welcome');
@@ -178,8 +179,15 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::post('store-documents', 'store')->name('documents.store');
         Route::get('verified-documents/{document}/show', 'show')->name('documents.show');
         Route::delete('verified-documents/{document}/delete', 'destroy')->name('documents.destroy');
-
     });
+
+    Route::controller(VendorStoreController::class)->group(function(){
+       Route::get('store', 'index')->name('stores');
+       Route::post('edit/store', 'update')->name('stores.update');
+       Route::get('store/detail', 'show')->name('stores.show');
+    });
+
+
 });
 
 

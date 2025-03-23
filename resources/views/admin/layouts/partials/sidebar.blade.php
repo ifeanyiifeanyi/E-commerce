@@ -58,6 +58,8 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('admin.vendors') }}">Vendors</a></li>
                         <li><a href="{{ route('admin.create.vendors') }}">Create Vendor</a></li>
+                        <li><a href="{{ route('admin.create.vendors') }}">Vendor Stores</a></li>
+
                     </ul>
                 </li>
 
@@ -69,10 +71,8 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('admin.products') }}">All Products</a></li>
                         <li><a href="{{ route('admin.products.create') }}">Create Product</a></li>
-                        <li><a href="pages-directory.html">Directory</a></li>
-                        <li><a href="pages-invoice.html">Invoice</a></li>
-                        <li><a href="pages-404.html">Error 404</a></li>
-                        <li><a href="pages-500.html">Error 500</a></li>
+                        <li><a href="pages-directory.html">Vendor Products</a></li>
+                        
                     </ul>
                 </li>
 

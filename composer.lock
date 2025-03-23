@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "95fa8927a3dc84cdde7597521018ce7c",
+    "content-hash": "611d99ba6cf6f00e96a60dea976532f4",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -6550,6 +6550,50 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "wisdom-diala/countrypkg-laravel",
+            "version": "1.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wisdom-diala/countrypkg-laravel.git",
+                "reference": "0951a6ffc33e171b0257b9c640a3dfe676f55c95"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wisdom-diala/countrypkg-laravel/zipball/0951a6ffc33e171b0257b9c640a3dfe676f55c95",
+                "reference": "0951a6ffc33e171b0257b9c640a3dfe676f55c95",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "WisdomDiala\\Countrypkg\\CountrypkgServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WisdomDiala\\Countrypkg\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wisdom Diala",
+                    "email": "dialawisdom@gmail.com"
+                }
+            ],
+            "description": "package to fetch all countries and states around the world and store in the database",
+            "support": {
+                "issues": "https://github.com/wisdom-diala/countrypkg-laravel/issues",
+                "source": "https://github.com/wisdom-diala/countrypkg-laravel/tree/1.0.7"
+            },
+            "time": "2023-03-20T13:37:17+00:00"
         }
     ],
     "packages-dev": [
