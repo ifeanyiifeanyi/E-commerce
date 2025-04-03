@@ -22,6 +22,9 @@ class ProductService
         // Handle thumbnail upload
         $thumbnailName = $this->handleThumbnailUpload($files['product_thumbnail']);
 
+           // Prepare measurement unit data
+           $measurementData = $this->prepareMeasurementData($data);
+
         // Create product data
         $productData = [
             'brand_id' => $data['brand_id'],
@@ -45,6 +48,15 @@ class ProductService
             'special_offer' => isset($data['special_offer']) ? 1 : 0,
             'special_deals' => isset($data['special_deals']) ? 1 : 0,
             'status' => isset($data['status']) ? 1 : 0,
+
+             // Add measurement related fields
+             'measurement_unit_id' => $measurementData['measurement_unit_id'] ?? null,
+             'base_unit' => $measurementData['base_unit'] ?? null,
+             'conversion_factor' => $measurementData['conversion_factor'] ?? 1,
+             'is_weight_based' => $measurementData['is_weight_based'] ?? false,
+             'allow_decimal_qty' => $measurementData['allow_decimal_qty'] ?? false,
+             'min_order_qty' => $measurementData['min_order_qty'] ?? 1,
+             'max_order_qty' => $measurementData['max_order_qty'] ?? null,
         ];
 
         // Create product
@@ -79,6 +91,10 @@ class ProductService
             $thumbnailName = $product->product_thumbnail;
         }
 
+        // Prepare measurement unit data
+        $measurementData = $this->prepareMeasurementData($data);
+
+
         // Update product data
         $productData = [
             'brand_id' => $data['brand_id'],
@@ -102,6 +118,14 @@ class ProductService
             'special_offer' => isset($data['special_offer']) ? 1 : 0,
             'special_deals' => isset($data['special_deals']) ? 1 : 0,
             'status' => isset($data['status']) ? 1 : 0,
+             // Add measurement related fields
+             'measurement_unit_id' => $measurementData['measurement_unit_id'] ?? $product->measurement_unit_id,
+             'base_unit' => $measurementData['base_unit'] ?? $product->base_unit,
+             'conversion_factor' => $measurementData['conversion_factor'] ?? $product->conversion_factor,
+             'is_weight_based' => $measurementData['is_weight_based'] ?? $product->is_weight_based,
+             'allow_decimal_qty' => $measurementData['allow_decimal_qty'] ?? $product->allow_decimal_qty,
+             'min_order_qty' => $measurementData['min_order_qty'] ?? $product->min_order_qty,
+             'max_order_qty' => $measurementData['max_order_qty'] ?? $product->max_order_qty,
         ];
 
         // Update product
@@ -272,5 +296,28 @@ class ProductService
             File::delete($imagePath);
         }
         $image->delete();
+    }
+
+      /**
+     * Prepare measurement unit data from request
+     */
+    private function prepareMeasurementData(array $data)
+    {
+        $result = [
+            'measurement_unit_id' => $data['measurement_unit_id'] ?? null,
+            'base_unit' => $data['base_unit'] ?? null,
+            'conversion_factor' => $data['conversion_factor'] ?? 1,
+            'is_weight_based' => isset($data['is_weight_based']) && $data['is_weight_based'] ? true : false,
+            'allow_decimal_qty' => isset($data['allow_decimal_qty']) && $data['allow_decimal_qty'] ? true : false,
+            'min_order_qty' => $data['min_order_qty'] ?? 1,
+            'max_order_qty' => !empty($data['max_order_qty']) ? $data['max_order_qty'] : null,
+        ];
+
+        // Auto-populate decimal qty for weight-based products
+        if ($result['is_weight_based']) {
+            $result['allow_decimal_qty'] = true;
+        }
+
+        return $result;
     }
 }

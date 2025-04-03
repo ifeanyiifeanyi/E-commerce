@@ -16,7 +16,10 @@ class DatabaseSeeder extends Seeder
         User::factory(50)->create();
 
         // Uncomment the below line to run the UserSeeder with 100 users
-        $this->call(UsersTableSeeder::class);
+        $this->call(
+            UsersTableSeeder::class,
+            MeasurementUnitSeeder::class
+        );
     }
 }
 

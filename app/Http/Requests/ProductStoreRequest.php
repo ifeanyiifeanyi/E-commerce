@@ -42,6 +42,41 @@ class ProductStoreRequest extends FormRequest
             'special_offer' => 'nullable|boolean',
             'special_deals' => 'nullable|boolean',
             'status' => 'nullable|boolean',
+
+            // Measurement related fields
+            'measurement_unit_id' => 'nullable|exists:measurement_units,id',
+            'conversion_factor' => 'nullable|numeric|min:0',
+            'is_weight_based' => 'nullable|boolean',
+            'allow_decimal_qty' => 'nullable|boolean',
+            'min_order_qty' => 'nullable|numeric|min:0.01',
+            'max_order_qty' => 'nullable|numeric|min:0.01|gt:min_order_qty',
+        ];
+    }
+
+     /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'brand_id' => 'brand',
+            'category_id' => 'category',
+            'subcategory_id' => 'subcategory',
+            'product_qty' => 'product quantity',
+            'measurement_unit_id' => 'measurement unit',
+            'min_order_qty' => 'minimum order quantity',
+            'max_order_qty' => 'maximum order quantity',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'discount_price.lt' => 'The discount price must be less than the selling price.',
+            'max_order_qty.gt' => 'The maximum order quantity must be greater than the minimum order quantity.',
         ];
     }
 }

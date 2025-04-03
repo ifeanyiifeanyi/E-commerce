@@ -32,7 +32,7 @@ class ProductUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique('products')->ignore($this->product),
             ],
-           
+
             'product_qty' => 'required|integer|min:0',
             'product_tags' => 'nullable|string',
             'product_size' => 'nullable|string',
@@ -48,6 +48,24 @@ class ProductUpdateRequest extends FormRequest
             'special_offer' => 'nullable|boolean',
             'special_deals' => 'nullable|boolean',
             'status' => 'nullable|boolean',
+             // Measurement related fields
+             'measurement_unit_id' => 'nullable|exists:measurement_units,id',
+             'conversion_factor' => 'nullable|numeric|min:0',
+             'is_weight_based' => 'nullable|boolean',
+             'allow_decimal_qty' => 'nullable|boolean',
+             'min_order_qty' => 'nullable|numeric|min:0.01',
+             'max_order_qty' => 'nullable|numeric|min:0.01|gt:min_order_qty',
         ];
     }
+
+     // Reuse the same attributes and messages from ProductStoreRequest
+     public function attributes(): array
+     {
+         return (new ProductStoreRequest())->attributes();
+     }
+
+     public function messages(): array
+     {
+         return (new ProductStoreRequest())->messages();
+     }
 }
