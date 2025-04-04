@@ -129,26 +129,38 @@ class Product extends Model
         return true;
     }
 
-      // Get formatted price with appropriate unit
-      public function getFormattedPriceAttribute()
-      {
-          $price = $this->discount_price ?? $this->selling_price;
+    // Get formatted price with appropriate unit
+    public function getFormattedPriceAttribute()
+    {
+        $price = $this->discount_price ?? $this->selling_price;
 
-          if ($this->is_weight_based && $this->measurementUnit) {
-              return $price . ' / ' . $this->measurementUnit->symbol;
-          }
+        if ($this->is_weight_based && $this->measurementUnit) {
+            return $price . ' / ' . $this->measurementUnit->symbol;
+        }
 
-          return $price;
-      }
+        return $price;
+    }
 
-      // Calculate sale percentage if discount price is set
-      public function getDiscountPercentageAttribute()
-      {
-          if (!$this->discount_price || !$this->selling_price) {
-              return 0;
-          }
+    // Calculate sale percentage if discount price is set
+    public function getDiscountPercentageAttribute()
+    {
+        if (!$this->discount_price || !$this->selling_price) {
+            return 0;
+        }
 
-          $discountAmount = $this->selling_price - $this->discount_price;
-          return round(($discountAmount / $this->selling_price) * 100);
-      }
+        $discountAmount = $this->selling_price - $this->discount_price;
+        return round(($discountAmount / $this->selling_price) * 100);
+    }
+
+
+    // Helper method to get formatted measure
+    public function getFormattedMeasureAttribute()
+    {
+        if ($this->measurement_unit_id && $this->measurementUnit) {
+            return $this->measurementUnit->symbol;
+        }
+        return '';
+    }
+
+    
 }

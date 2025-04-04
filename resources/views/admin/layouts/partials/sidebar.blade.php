@@ -48,7 +48,17 @@
                     </ul>
                 </li>
 
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="ri-file-list-3-line"></i>
+                        <span>Measurement Units</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ route('admin.measurement-units') }}">View Units</a></li>
+                        <li><a href="{{ route('admin.measurement-units.create') }}">Create Unit</a></li>
+                    </ul>
 
+                </li>
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -72,7 +82,7 @@
                         <li><a href="{{ route('admin.products') }}">All Products</a></li>
                         <li><a href="{{ route('admin.products.create') }}">Create Product</a></li>
                         <li><a href="pages-directory.html">Vendor Products</a></li>
-                        
+
                     </ul>
                 </li>
 

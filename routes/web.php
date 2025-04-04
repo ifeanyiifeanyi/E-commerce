@@ -19,6 +19,7 @@ use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Auth\VendorRegistrationController;
 use App\Http\Controllers\Admin\ManageVendorDocumentController;
+use App\Http\Controllers\Admin\MeasurementUnitController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,7 +43,7 @@ Route::middleware('auth')->group(function () {
         $request->fulfill();
 
         // Redirect based on user role
-        $user = $request->user();
+        $user = request()->user();
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         } elseif ($user->role === 'vendor') {
@@ -102,7 +103,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::delete('subcategory/{subcategory}/destroy', 'destroy')->name('subcategories.destroy');
     });
 
-    Route::controller(VendorManagementController::class)->group(function(){
+    Route::controller(VendorManagementController::class)->group(function () {
         Route::get('vendors', 'index')->name('vendors');
         Route::get('vendors/{user}', 'showVendor')->name('vendors.show');
         Route::patch('vendor/approve/{user}', 'approveVendor')->name('vendors.approve');
@@ -113,10 +114,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::post('store/vendor', 'storeVendor')->name('vendors.store');
         Route::get('vendor/edit/{user}', 'editVendor')->name('vendors.edit');
         Route::put('vendor/update/{user}', 'updateVendor')->name('vendors.update');
-
     });
 
-    Route::controller(ManageVendorDocumentController::class)->group(function(){
+    Route::controller(ManageVendorDocumentController::class)->group(function () {
         Route::get('vendor/documents/{user?}', 'index')->name('vendors.documents');
         Route::get('vendor/documents/{user}/create', 'create')->name('vendors.documents.create');
 
@@ -127,6 +127,21 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
 
         Route::post('vendor/documents/{user}', 'store')->name('vendors.documents.store');
+    });
+
+
+    Route::controller(MeasurementUnitController::class)->group(function () {
+
+        Route::get('measurement-units', 'index')->name('measurement-units');
+        Route::get('measurement-units/create', 'create')->name('measurement-units.create');
+        Route::post('measurement-units/store', 'store')->name('measurement-units.store');
+        Route::get('measurement-units/{measurement_unit}/show', 'show')->name('measurement-units.show');
+        Route::get('measurement-units/{measurement_unit}/edit', 'edit')->name('measurement-units.edit');
+        Route::put('measurement-units/{measurement_unit}/update', 'update')->name('measurement-units.update');
+        Route::delete('measurement-units/{measurement_unit}/delete', 'destroy')->name('measurement-units.destroy');
+        Route::patch('measurement-units/{measurement_unit}/toggle-active', 'toggleActive')->name('measurement-units.toggle-active');
+
+        Route::get('measurement-units/get-unit-details', 'getUnitDetails')->name('admin.measurement-units.get-unit-details');
     });
 
     Route::controller(ProductController::class)->group(function () {
@@ -142,7 +157,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::get('get-subcategories', 'getSubcategories')->name('get.subcategories');
         Route::get('get-category', 'getCategories')->name('get.categories');
 
-         // Delete multi-image
+        // Delete multi-image
         Route::delete('/product-multi-image/{id}', 'deleteMultiImage')->name('product.delete.multi-image');
         Route::post('products/{product}/toggle-status',  'toggleStatus')->name('admin.products.toggle-status');
 
@@ -150,7 +165,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::get('get-brands', 'getBrands')->name('get.brands');
         Route::get('get-vendors', 'getVendors')->name('get.vendors');
         Route::get('get-vendor-documents', 'getVendorDocuments')->name('get.vendor.documents');
-
     });
 });
 
@@ -173,7 +187,7 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::delete('/profile/sessions', 'destroySession')->name('sessions.destroy');
     });
 
-    Route::controller(VendorDocumentController::class)->group(function(){
+    Route::controller(VendorDocumentController::class)->group(function () {
         Route::get('verified-documents', 'index')->name('documents');
         Route::get('create-documents', 'create')->name('documents.create');
         Route::post('store-documents', 'store')->name('documents.store');
@@ -181,13 +195,11 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::delete('verified-documents/{document}/delete', 'destroy')->name('documents.destroy');
     });
 
-    Route::controller(VendorStoreController::class)->group(function(){
-       Route::get('store', 'index')->name('stores');
-       Route::post('edit/store', 'update')->name('stores.update');
-       Route::get('store/detail', 'show')->name('stores.show');
+    Route::controller(VendorStoreController::class)->group(function () {
+        Route::get('store', 'index')->name('stores');
+        Route::post('edit/store', 'update')->name('stores.update');
+        Route::get('store/detail', 'show')->name('stores.show');
     });
-
-
 });
 
 
