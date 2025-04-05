@@ -19,7 +19,8 @@
 
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <h6 class="mb-3">Basic Information</h6>
+                                <h4 class="mb-3">Basic Information</h4>
+                                <hr>
                             </div>
 
                             <div class="col-md-12 mt-4 mb-3">
@@ -84,7 +85,8 @@
 
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <h6 class="mb-3">Pricing & Inventory</h6>
+                                <h4 class="mb-3">Pricing & Inventory</h4>
+                                <hr>
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -127,7 +129,8 @@
 
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <h6 class="mb-3">Product Details</h6>
+                                <h4 class="mb-3">Product Details</h4>
+                                <hr>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -180,28 +183,134 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h4 class="mb-3">Measurement Details</h4>
+                                <hr>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="measurement_unit_id" class="form-label">Measurement Unit</label>
+                                <select class="form-select @error('measurement_unit_id') is-invalid @enderror"
+                                    id="measurement_unit_id" name="measurement_unit_id">
+                                    <option value="">Select Unit</option>
+                                    @foreach ($measurementUnits as $unit)
+                                        <option value="{{ $unit->id }}"
+                                            {{ old('measurement_unit_id') == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->formatted_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('measurement_unit_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="base_unit" class="form-label">Base Unit</label>
+                                <input type="text" class="form-control @error('base_unit') is-invalid @enderror"
+                                    id="base_unit" name="base_unit" value="{{ old('base_unit') }}" readonly>
+                                @error('base_unit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="conversion_factor" class="form-label">Conversion Factor</label>
+                                <input type="number" step="0.000001"
+                                    class="form-control @error('conversion_factor') is-invalid @enderror"
+                                    id="conversion_factor" name="conversion_factor"
+                                    value="{{ old('conversion_factor', 1) }}" readonly>
+                                @error('conversion_factor')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                           <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="is_weight_based"
+                                        name="is_weight_based" value="1"
+                                        {{ old('is_weight_based') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_weight_based">Weight Based Product</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="allow_decimal_qty"
+                                        name="allow_decimal_qty" value="1"
+                                        {{ old('allow_decimal_qty') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="allow_decimal_qty">Allow Decimal
+                                        Quantities</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="min_order_qty" class="form-label">Minimum Order Quantity</label>
+                                <input type="number" step="0.01"
+                                    class="form-control @error('min_order_qty') is-invalid @enderror" id="min_order_qty"
+                                    name="min_order_qty" value="{{ old('min_order_qty', 1) }}">
+                                @error('min_order_qty')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="max_order_qty" class="form-label">Maximum Order Quantity</label>
+                                <input type="number" step="0.01"
+                                    class="form-control @error('max_order_qty') is-invalid @enderror" id="max_order_qty"
+                                    name="max_order_qty" value="{{ old('max_order_qty') }}">
+                                <small class="form-text text-muted">Leave empty for unlimited</small>
+                                @error('max_order_qty')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                           </div>
+                        </div>
 
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <h6 class="mb-3">Images</h6>
+                                <h4 class="mb-3">Product Images</h4>
+                                <hr>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="product_thumbnail" class="form-label">Product Thumbnail <span
-                                        class="text-danger">*</span></label>
-                                <input type="file"
-                                    class="form-control @error('product_thumbnail') is-invalid @enderror"
-                                    id="product_thumbnail" name="product_thumbnail" required>
-                                <div class="form-text">Recommended size: 800x800 pixels</div>
+                            <div class="col-md-6 mb-3"
+                                style="cursor: pointer !important; display: flex !important; flex-direction: column !important; align-items: center !important;">
+                                <label
+                                    style="cursor: pointer !important;border: 1px solid #212529c2 !important;
+"
+                                    for="product_thumbnail" class="form-label shadow-lg px-3 py-3">Product Thumbnail <span
+                                        class="text-danger">*</span> <br>
+                                    <center>
+                                        <i class="fas fa-upload fa-5x"></i>
+                                    </center>
+                                    <input type="file"
+                                        class="form-control @error('product_thumbnail') is-invalid @enderror"
+                                        id="product_thumbnail" name="product_thumbnail" required>
+                                </label>
+
+                                <div class="form-text text-muted">Recommended size: 800x800 pixels</div>
                                 <div id="thumbnail-preview"></div>
                                 @error('product_thumbnail')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="multi_images" class="form-label">Additional Images</label>
-                                <input type="file" class="form-control @error('multi_images.*') is-invalid @enderror"
-                                    id="multi_images" name="multi_images[]" multiple>
+                            <div class="col-md-6 mb-3"
+                                style="cursor: pointer !important; display: flex !important; flex-direction: column !important; align-items: center !important;">
+
+                                <label style="cursor: pointer !important;border: 1px solid #212529c2 !important;
+"
+                                    for="multi_images" class="form-label  shadow-lg px-3 py-3">Product Additional Images
+                                    <br>
+                                    <center>
+                                        <i class="fas fa-file-upload fa-5x"></i>
+                                    </center>
+                                    <input type="file"
+                                        class="form-control @error('multi_images.*') is-invalid @enderror"
+                                        id="multi_images" name="multi_images[]" multiple>
+                                </label>
+
                                 <div class="form-text">You can select multiple images</div>
                                 <div id="multi-images-preview" class="d-flex flex-wrap"></div>
                                 @error('multi_images.*')
@@ -212,7 +321,8 @@
 
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <h6 class="mb-3">Product Options</h6>
+                                <h4 class="mb-3">Product Options</h4>
+                                <hr>
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -249,7 +359,7 @@
 
                             <div class="col-md-12 mb-3">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="status" name="status"
+                                    <input class="form-check-input" type="checkbox" id="status1" name="status"
                                         value="1" {{ old('status', 1) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="status">Active</label>
                                 </div>
@@ -269,6 +379,25 @@
 
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <style>
+        input[type="file"] {
+            padding: 0.5rem;
+            display: none !important;
+        }
+
+        input[type='text'],
+        select,
+        input[type='number'],
+        .input-group-text {
+            border: 1px solid #ddd !important;
+            border-radius: 5px !important;
+            padding: 0.5rem !important;
+            /* background-color: #f8f9fa !important; */
+            color: #212529 !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+        }
+    </style>
 @endsection
 
 @section('js')
@@ -372,6 +501,60 @@
                         }
                         reader.readAsDataURL(file);
                     }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // Add this to the existing JS section in the product create form
+        $(document).ready(function() {
+            // Initialize measurement unit handling
+            $('#measurement_unit_id').change(function() {
+                const unitId = $(this).val();
+
+                if (unitId) {
+                    // Fetch unit details via AJAX
+                    $.ajax({
+                        url: "{{ route('admin.measurement-units.get-unit-details') }}",
+                        type: "GET",
+                        data: {
+                            unit_id: unitId
+                        },
+                        success: function(data) {
+                            console.log(data);
+                            // Update base unit and conversion factor fields
+                            if (data.is_base_unit) {
+                                $('#base_unit').val(data.symbol);
+                            } else if (data.base_unit) {
+                                $('#base_unit').val(data.base_unit.symbol);
+                            } else {
+                                $('#base_unit').val('');
+                            }
+
+                            $('#conversion_factor').val(data.conversion_factor);
+
+                            // If the unit type is weight, auto-check weight based option
+                            if (data.type === 'weight') {
+                                $('#is_weight_based').prop('checked', true);
+                                $('#allow_decimal_qty').prop('checked', true);
+                            }
+                        },
+                        error: function() {
+                            toastr.error('Error loading unit details');
+                        }
+                    });
+                } else {
+                    // Clear fields if no unit selected
+                    $('#base_unit').val('');
+                    $('#conversion_factor').val('1');
+                }
+            });
+
+            // Auto-check allow decimal quantities when weight based is checked
+            $('#is_weight_based').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#allow_decimal_qty').prop('checked', true);
                 }
             });
         });

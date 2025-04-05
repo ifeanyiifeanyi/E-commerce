@@ -50,6 +50,10 @@ class ProductStoreRequest extends FormRequest
             'allow_decimal_qty' => 'nullable|boolean',
             'min_order_qty' => 'nullable|numeric|min:0.01',
             'max_order_qty' => 'nullable|numeric|min:0.01|gt:min_order_qty',
+            'base_unit' => 'nullable|required_if:exi|string|max:255',
+            'base_unit' => 'nullable|required_if:is_weight_based,true|string|max:255',
+            'base_unit' => 'nullable|required_if:allow_decimal_qty,true|string|max:255',
+            'base_unit' => 'nullable|required_if:allow_decimal_qty,false|string|max:255',
         ];
     }
 

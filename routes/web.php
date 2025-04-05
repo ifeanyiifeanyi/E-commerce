@@ -141,7 +141,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::delete('measurement-units/{measurement_unit}/delete', 'destroy')->name('measurement-units.destroy');
         Route::patch('measurement-units/{measurement_unit}/toggle-active', 'toggleActive')->name('measurement-units.toggle-active');
 
-        Route::get('measurement-units/get-unit-details', 'getUnitDetails')->name('admin.measurement-units.get-unit-details');
+        Route::get('measurement-units/get-unit-details', 'getUnitDetails')->name('measurement-units.get-unit-details');
     });
 
     Route::controller(ProductController::class)->group(function () {

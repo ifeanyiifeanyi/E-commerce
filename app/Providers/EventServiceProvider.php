@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Product;
 use App\Models\MeasurementUnit;
-use App\Observers\MeasurementUnitObserver;
+use App\Observers\ProductObserver;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use App\Observers\MeasurementUnitObserver;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -32,5 +34,6 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         MeasurementUnit::observe(MeasurementUnitObserver::class);
+        Product::observe(ProductObserver::class);
     }
 }

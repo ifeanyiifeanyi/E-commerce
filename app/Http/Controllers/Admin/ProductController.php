@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
+use App\Models\MeasurementUnit;
 use App\Services\ProductService;
 use App\Models\ProductMultiImage;
 use App\Http\Controllers\Controller;
@@ -32,8 +33,9 @@ class ProductController extends Controller
     {
         $brands = Brand::active()->get();
         $categories = Category::all();
+        $measurementUnits = MeasurementUnit::where('is_active', true)->get();
 
-        return view('admin.products.create', compact('brands', 'categories'));
+        return view('admin.products.create', compact('brands', 'categories', 'measurementUnits'));
     }
 
     public function show(Product $product)
