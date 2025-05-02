@@ -1,64 +1,83 @@
-@extends('layouts.vendor')
+@extends('layouts.guest')
 
-@section('title', 'Login')
+@section('title', 'Vendor Login')
 
+@section('content')
+<div class="auth-container">
+    <h2 class="auth-title">Vendor Login</h2>
+    <p class="auth-subtitle">Access your vendor dashboard</p>
 
-@section('vendor-content')
-    <div class="form-holder">
-        <div class="form-content">
-            <div class="form-items">
-                <h3>Signup as a vendor</h3>
-                <p>Access to the most powerful tool in the entire design and web industry.</p>
-                <div class="page-links">
-                    <a class="{{ request()->routeIs('vendor.login.view') ? 'active' : '' }}" href="{{ route('vendor.login.view') }}">Login</a>
-                    <a class="{{ request()->routeIs('vendor.register.view') ? 'active' : '' }}" href="{{ route('vendor.register.view') }}">Register</a>
-                </div>
-
-
-
-                <form method="POST" action="{{ route('vendor.register') }}">
-                    @csrf
-
-
-                    <!-- Username -->
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input id="username" type="text" class="form-control @error('username') is-invalid @enderror"
-                            name="username" value="{{ old('username') }}" required autocomplete="username">
-                        @error('username')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-
-
-
-
-                    <!-- Password -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
-                            name="password" required autocomplete="new-password">
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-
-                    <div class="gap-2 d-grid">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-
-                    <div class="mt-3 text-center">
-                        <p>Get started as a vendor ? <a href="{{ route('vendor.register.view') }}"
-                                class="fw-medium text-decoration-none">Sign Up</a></p>
-                    </div>
-                </form>
-                <div class="other-links">
-                    <span>Or register with</span><a href="#">Facebook</a><a href="#">Google</a><a
-                        href="#">Linkedin</a>
-                </div>
-            </div>
+    @if(session('status'))
+        <div class="alert alert-success mb-3">
+            {{ session('status') }}
         </div>
-    </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger mb-3">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('vendor.login') }}" class="auth-form">
+        @csrf
+
+        <div class="mb-3">
+            <input class="form-control @error('username') is-invalid @enderror" type="text"
+                name="username" placeholder="Email or Username" required value="{{ old('username') }}">
+            @error('username')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+
+        <div class="mb-3 position-relative">
+            <input class="form-control @error('password') is-invalid @enderror" type="password"
+                name="password" placeholder="Password" required>
+            <i class="fa fa-eye password-toggle"></i>
+            @error('password')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                <label class="form-check-label" for="remember">
+                    Remember Me
+                </label>
+            </div>
+            <a href="{{ route('password.request') }}" class="text-decoration-none">Forgot Password?</a>
+        </div>
+
+        <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+
+        <div class="text-center">
+            <p>Don't have a vendor account? <a href="{{ route('vendor.register.step1') }}">Register</a></p>
+        </div>
+    </form>
+</div>
+
+@push('scripts')
+<script>
+    // Toggle password visibility
+    document.querySelector('.password-toggle').addEventListener('click', function() {
+        const passwordInput = document.querySelector('input[name="password"]');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            this.classList.remove('fa-eye');
+            this.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            this.classList.remove('fa-eye-slash');
+            this.classList.add('fa-eye');
+        }
+    });
+</script>
+@endpush
 @endsection

@@ -1,9 +1,9 @@
-<footer class="footer">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="text-center col fs-13 text-muted">
-                &copy; <script>document.write(new Date().getFullYear())</script> - <a href="#!" class="text-reset fw-semibold">{{ config('app.name') }}</a>
-            </div>
-        </div>
+<footer class="footer mt-4" >
+    <div class="">
+      <a href="#">Features</a>
+      <a href="#">Resources</a>
+      <a href="#">Documentation</a>
+      <a href="#">Get Our Guide</a>
     </div>
-</footer>
+    <div>Copyright © 2025. All Rights Reserved by <b>{{ config('app.name') }}</b></div>
+  </footer>

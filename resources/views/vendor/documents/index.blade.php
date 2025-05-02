@@ -21,7 +21,7 @@
                                 <h4 class="alert-heading">Required Documents Missing!</h4>
                                 <p>You need to upload the required verification documents to complete your vendor profile.
                                 </p>
-                                <a href="{{ route('vendor.documents.index') }}" class="btn btn-primary">Upload Documents</a>
+                                <a href="{{ route('vendor.documents') }}" class="btn btn-primary"><i class="fas fa-file-upload"></i> Upload Documents</a>
                             </div>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                                 <h4 class="alert-heading">Documents Under Review</h4>
                                 <p>{{ $pendingDocuments }} document(s) are currently under review. We'll notify you once the
                                     review is complete.</p>
-                               
+
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title">Verification Documents</h3>
                         <a href="{{ route('vendor.documents.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Upload New Document
+                            <i class="fas fa-file-upload"></i> Upload
                         </a>
                     </div>
                     <div class="card-body">

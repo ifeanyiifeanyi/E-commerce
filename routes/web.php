@@ -10,28 +10,83 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Auth\VendorLoginController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Vendor\VendorStoreController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Admin\MeasurementUnitController;
 use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Auth\VendorRegistrationController;
 use App\Http\Controllers\Admin\ManageVendorDocumentController;
-use App\Http\Controllers\Admin\MeasurementUnitController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 
-Route::controller(VendorRegistrationController::class)->group(function () {
-    Route::get('vendor/register', 'create')->name('vendor.register.view');
-    Route::post('vendor/register', 'store')->name('vendor.register');
-
-    Route::get('vendor/login', 'login')->name('vendor.login.view');
+// Vendor Login Routes
+Route::controller(VendorLoginController::class)->group(function () {
+    Route::get('vendor/login', 'showLoginForm')->name('vendor.login.view');
+    Route::post('vendor/login', 'login')->name('vendor.login');
+    Route::post('vendor/logout', 'logout')->name('vendor.logout');
 });
+
+
+Route::controller(VendorRegistrationController::class)->group(function () {
+    // Route::get('vendor/register', 'create')->name('vendor.register.view');
+    // Route::post('vendor/register', 'store')->name('vendor.register');
+
+    // Route::get('vendor/login', 'login')->name('vendor.login.view');
+    // Route::post('vendor/login', 'login')->name('vendor.login');
+
+
+    // Registration routes - Multi-step process
+    Route::get('vendor/register', 'showStep1Form')->name('vendor.register.step1');
+    Route::post('vendor/register/step1', 'processStep1')->name('vendor.register.step1.store');
+
+    Route::get('vendor/register/step2', 'showStep2Form')->name('vendor.register.step2');
+    Route::post('vendor/register/step2', 'processStep2')->name('vendor.register.step2.store');
+
+    Route::get('vendor/register/step3', 'showStep3Form')->name('vendor.register.step3');
+    Route::post('vendor/register/step3', 'processStep3')->name('vendor.register.step3.store');
+
+    Route::get('vendor/register/step4', 'showStep4Form')->name('vendor.register.step4');
+    Route::post('vendor/register/complete', 'complete')->name('vendor.register.complete');
+
+    Route::get('pending',  'pending')->name('vendor.pending');
+
+
+    Route::post('register/send-code',  'sendVerificationCode')->name('vendor.register.send-code');
+    Route::post('/vendor/register/send-phone-code', 'sendPhoneVerificationCode')->name('vendor.register.send-phone-code');
+});
+
+
+// Vendor Registration Routes
+// Route::prefix('vendor')->name('vendor.')->group(function () {
+//     // Login routes
+//     Route::get('login', [VendorRegistrationController::class, 'showLoginForm'])->name('login.view');
+
+
+//     // Registration routes - Multi-step process
+//     Route::get('register', [VendorRegistrationController::class, 'showStep1Form'])->name('register.step1');
+//     Route::post('register/step1', [VendorRegistrationController::class, 'processStep1'])->name('register.step1.store');
+
+//     Route::get('register/step2', [VendorRegistrationController::class, 'showStep2Form'])->name('register.step2');
+//     Route::post('register/step2', [VendorRegistrationController::class, 'processStep2'])->name('register.step2.store');
+
+//     Route::get('register/step3', [VendorRegistrationController::class, 'showStep3Form'])->name('register.step3');
+//     Route::post('register/step3', [VendorRegistrationController::class, 'processStep3'])->name('register.step3.store');
+
+//     Route::get('register/step4', [VendorRegistrationController::class, 'showStep4Form'])->name('register.step4');
+//     Route::post('register/complete', [VendorRegistrationController::class, 'complete'])->name('register.complete');
+
+//     // Pending approval route
+//     Route::get('pending', [VendorRegistrationController::class, 'pending'])->name('pending');
+// });
 
 // Email Verification Routes
 Route::middleware('auth')->group(function () {
@@ -144,6 +199,39 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::get('measurement-units/get-unit-details', 'getUnitDetails')->name('measurement-units.get-unit-details');
     });
 
+
+    // Route::controller(InventoryController::class)->group(function(){
+    //     Route::get('inventory', 'index')->name('inventory');
+    //     Route::get('inventory/{product}/show', 'show')->name('inventory.show');
+    //     Route::post('inventory/{product}/store', 'store')->name('inventory.store');
+    //     Route::put('inventory/{product}/update', 'update')->name('inventory.update');
+    //     Route::delete('inventory/{product}/delete', 'destroy')->name('inventory.destroy');
+
+    //     Route::get('get-product-details', 'getProductDetails')->name('get.product.details');
+
+    //     Route::get('get-product-logs', 'getProductLogs')->name('inventory.logs');
+    //     Route::get('product-inventory-alert', 'getProductLogs')->name('inventory.alerts');
+
+    //     Route::post('adjust-inventory', 'getProductAlerts')->name('inventory.adjust');
+
+    // });
+
+    Route::controller(InventoryController::class)->group(function () {
+        Route::get('inventory', 'index')->name('inventory');
+        Route::get('inventory/{product}/logs', 'viewInventoryLogs')->name('inventory.logs');
+        Route::get('inventory/alerts', 'viewAlerts')->name('inventory.alerts');
+        Route::post('inventory/{product}/adjust', 'adjustInventory')->name('inventory.adjust');
+
+        // For individual product inventory management
+        Route::get('inventory/{product}', 'show')->name('inventory.show');
+        Route::post('inventory/{product}/reserve', 'reserveInventory')->name('inventory.reserve');
+        Route::post('inventory/{product}/release', 'releaseReservedInventory')->name('inventory.release');
+
+        // Product lookup for AJAX
+        Route::get('get-product-details', 'getProductDetails')->name('get.product.details');
+        Route::post('resolve', 'resolveAlert')->name('inventory.alerts.resolve');
+    });
+
     Route::controller(ProductController::class)->group(function () {
 
         Route::get('products', 'index')->name('products');
@@ -170,7 +258,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
 
 
-Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 'role:vendor']], function () {
+Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 'role:vendor', 'vendor.member']], function () {
     Route::controller(VendorController::class)->group(function () {
         Route::get('dashboard', 'dashboard')->name('dashboard');
         Route::get('logout', 'logout')->name('logout');

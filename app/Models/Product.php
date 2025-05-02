@@ -36,6 +36,14 @@ class Product extends Model
         'allow_decimal_qty',
         'min_order_qty',
         'max_order_qty',
+
+        'low_stock_threshold',
+        'enable_stock_alerts',
+        'stock_status',
+        'allow_backorders',
+        'track_inventory',
+        'reserved_qty',
+        'stock_last_updated',
     ];
 
     protected $casts = [
@@ -49,7 +57,23 @@ class Product extends Model
         'conversion_factor' => 'float',
         'min_order_qty' => 'float',
         'max_order_qty' => 'float',
+
+        'enable_stock_alerts' => 'boolean',
+        'allow_backorders' => 'boolean',
+        'track_inventory' => 'boolean',
+        'stock_last_updated' => 'datetime',
     ];
+
+    // New relationships
+    public function inventoryLogs()
+    {
+        return $this->hasMany(InventoryLog::class);
+    }
+
+    public function inventoryAlerts()
+    {
+        return $this->hasMany(InventoryAlert::class);
+    }
 
     public function brand()
     {
@@ -161,6 +185,172 @@ class Product extends Model
         }
         return '';
     }
+    // New methods for inventory management
+    public function getAvailableQtyAttribute()
+    {
+        return $this->product_qty - $this->reserved_qty;
+    }
 
-    
+    public function isLowStock()
+    {
+        if (!$this->low_stock_threshold) {
+            return false;
+        }
+
+        return $this->available_qty <= $this->low_stock_threshold;
+    }
+
+    public function isOutOfStock()
+    {
+        return $this->available_qty <= 0;
+    }
+
+    public function canBackorder()
+    {
+        return $this->allow_backorders && $this->stock_status !== 'discontinued';
+    }
+
+    public function updateStockStatus()
+    {
+        $oldStatus = $this->stock_status;
+
+        if ($this->available_qty <= 0) {
+            if ($this->allow_backorders) {
+                $this->stock_status = 'backordered';
+            } else {
+                $this->stock_status = 'out_of_stock';
+            }
+        } else {
+            $this->stock_status = 'in_stock';
+        }
+
+        $this->stock_last_updated = now();
+
+        if ($oldStatus !== $this->stock_status) {
+            $this->save();
+
+            // Generate alert for out of stock
+            if ($this->stock_status === 'out_of_stock') {
+                $this->createInventoryAlert('out_of_stock');
+            }
+
+            // Generate alert for restock
+            if ($oldStatus === 'out_of_stock' && $this->stock_status === 'in_stock') {
+                $this->createInventoryAlert('restock');
+            }
+        }
+
+        // Check low stock threshold
+        if ($this->enable_stock_alerts && $this->isLowStock()) {
+            $this->createInventoryAlert('low_stock');
+        }
+
+        return $this;
+    }
+
+    public function adjustInventory($quantity, $actionType, $userId = null, $referenceType = null, $referenceId = null, $notes = null)
+    {
+        if (!$this->track_inventory) {
+            return $this;
+        }
+
+        $previousQty = $this->product_qty;
+        $this->product_qty += $quantity;
+
+        // Create inventory log
+        $this->inventoryLogs()->create([
+            'user_id' => $userId,
+            'action_type' => $actionType,
+            'quantity_change' => $quantity,
+            'previous_quantity' => $previousQty,
+            'new_quantity' => $this->product_qty,
+            'reference_type' => $referenceType,
+            'reference_id' => $referenceId,
+            'notes' => $notes
+        ]);
+
+        $this->stock_last_updated = now();
+        $this->save();
+
+        // Update stock status based on new quantity
+        $this->updateStockStatus();
+
+        return $this;
+    }
+
+    public function reserveInventory($quantity, $orderId = null)
+    {
+        if (!$this->track_inventory) {
+            return true;
+        }
+
+        // Check if we can reserve the requested quantity
+        if (!$this->allow_backorders && $quantity > $this->available_qty) {
+            return false;
+        }
+
+        $this->reserved_qty += $quantity;
+        $this->stock_last_updated = now();
+        $this->save();
+
+        // Log the reservation
+        $this->inventoryLogs()->create([
+            'action_type' => 'reserve',
+            'quantity_change' => 0, // No change to product_qty
+            'previous_quantity' => $this->product_qty,
+            'new_quantity' => $this->product_qty,
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+            'notes' => "Reserved {$quantity} units"
+        ]);
+
+        $this->updateStockStatus();
+
+        return true;
+    }
+
+    public function releaseReservedInventory($quantity, $orderId = null)
+    {
+        if (!$this->track_inventory) {
+            return $this;
+        }
+
+        $this->reserved_qty = max(0, $this->reserved_qty - $quantity);
+        $this->stock_last_updated = now();
+        $this->save();
+
+        // Log the release
+        $this->inventoryLogs()->create([
+            'action_type' => 'reserve',
+            'quantity_change' => 0, // No change to product_qty
+            'previous_quantity' => $this->product_qty,
+            'new_quantity' => $this->product_qty,
+            'reference_type' => 'order',
+            'reference_id' => $orderId,
+            'notes' => "Released {$quantity} reserved units"
+        ]);
+
+        $this->updateStockStatus();
+
+        return $this;
+    }
+
+    public function createInventoryAlert($alertType, $notes = null)
+    {
+        // Check if there's an unresolved alert of the same type
+        $existingAlert = $this->inventoryAlerts()
+            ->where('alert_type', $alertType)
+            ->where('is_resolved', false)
+            ->first();
+
+        if ($existingAlert) {
+            // Don't create duplicate alerts
+            return $existingAlert;
+        }
+
+        return $this->inventoryAlerts()->create([
+            'alert_type' => $alertType,
+            'notes' => $notes
+        ]);
+    }
 }

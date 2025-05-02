@@ -28,11 +28,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'photo',
         'phone',
         'address',
+        'account_type',
         'role',
+        'country',
         'status',
         'two_factor_secret',
         'two_factor_enabled',
         'two_factor_recovery_codes',
+        'email_verified_at'
     ];
 
     /**
@@ -96,5 +99,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function getAdminMemberAttribute()
+    {
+        return self::where('role', 'admin')->get();
+    }
+
+    public static function getAdminMembers()
+    {
+        return self::where('role', 'admin')->get()->toArray();
     }
 }

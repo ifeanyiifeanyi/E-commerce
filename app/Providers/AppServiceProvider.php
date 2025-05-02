@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Channels\TwilioChannel;
 
 use Illuminate\Pagination\Paginator;
+use App\Channels\AfricasTalkingChannel;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Notification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
+        Notification::extend('twilio', function ($app) {
+            return new TwilioChannel();
+        });
 
     }
 }

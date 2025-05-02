@@ -17,6 +17,6 @@ class VendorController extends Controller
         auth()->guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login');
+        return redirect()->route('vendor.login.view');
     }
 }
