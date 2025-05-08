@@ -168,7 +168,7 @@
                                         <label for="selling_price" class="form-label">Regular Price
                                             ({{ $currencySymbol }}) <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" id="selling_price"
-                                            name="selling_price" min="0" step="0.01"
+                                            name="selling_price" min="0" step="000001"
                                             value="{{ old('selling_price', $product->selling_price) }}" required>
                                         <small class="text-muted">Price in {{ $currency }}</small>
                                         @error('selling_price')
@@ -182,7 +182,7 @@
                                         <label for="discount_price" class="form-label">Discount Price
                                             ({{ $currencySymbol }})</label>
                                         <input type="number" class="form-control" id="discount_price"
-                                            name="discount_price" min="0" step="0.01"
+                                            name="discount_price" min="0" step="0.000001"
                                             value="{{ old('discount_price', $product->discount_price) }}">
                                         <small class="text-muted">Leave empty for no discount</small>
                                         @error('discount_price')
@@ -290,7 +290,7 @@
                                     <div class="mb-3">
                                         <label for="conversion_factor" class="form-label">Conversion Factor</label>
                                         <input type="number" class="form-control" id="conversion_factor"
-                                            name="conversion_factor" min="0.001" step="0.00001"
+                                            name="conversion_factor" min="0.001" step="0.0000001"
                                             value="{{ old('conversion_factor', $product->conversion_factor) }}">
                                         <small class="text-muted">For conversion between units</small>
                                         @error('conversion_factor')
