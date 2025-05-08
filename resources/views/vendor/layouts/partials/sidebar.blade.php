@@ -13,7 +13,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ route('vendor.products') }}" class="nav-link"> <i class="bi bi-bag"></i> Products </a>
+          <a href="{{ route('vendor.products') }}" class="nav-link {{ request()->routeIs('vendor.products*') ? 'active' : '' }}"> <i class="bi bi-bag"></i> Products </a>
         </li>
         <li class="nav-item">
           <a href="#" class="nav-link">

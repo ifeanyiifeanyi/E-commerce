@@ -21,77 +21,7 @@ class ProductService
     /**
      * Create a new product
      */
-    // public function createProduct(array $data, array $files)
-    // {
-    //     // Handle thumbnail upload
-    //     $thumbnailName = $this->handleThumbnailUpload($files['product_thumbnail']);
-
-    //     // Prepare measurement unit data
-    //     $measurementData = $this->prepareMeasurementData($data);
-
-    //     // Create product data
-    //     $productData = [
-    //         'brand_id' => $data['brand_id'],
-    //         'category_id' => $data['category_id'],
-    //         'subcategory_id' => $data['subcategory_id'],
-    //         'product_name' => $data['product_name'],
-    //         'product_slug' => Str::slug($data['product_name']),
-    //         'product_code' => $data['product_code'],
-    //         'product_qty' => $data['product_qty'],
-    //         'product_tags' => $data['product_tags'] ?? null,
-    //         'product_size' => $data['product_size'] ?? null,
-    //         'product_color' => $data['product_color'] ?? null,
-    //         'selling_price' => $data['selling_price'],
-    //         'discount_price' => $data['discount_price'] ?? null,
-    //         'short_description' => $data['short_description'],
-    //         'long_description' => $data['long_description'],
-    //         'product_thumbnail' => $thumbnailName,
-    //         'vendor_id' => $data['vendor_id'] ?? null,
-    //         'hot_deals' => isset($data['hot_deals']) ? 1 : 0,
-    //         'featured' => isset($data['featured']) ? 1 : 0,
-    //         'special_offer' => isset($data['special_offer']) ? 1 : 0,
-    //         'special_deals' => isset($data['special_deals']) ? 1 : 0,
-    //         'status' => isset($data['status']) ? 1 : 0,
-
-    //         // Add measurement related fields
-    //         'measurement_unit_id' => $measurementData['measurement_unit_id'] ?? null,
-    //         'base_unit' => $measurementData['base_unit'] ?? null,
-    //         'conversion_factor' => $measurementData['conversion_factor'] ?? 1,
-    //         'is_weight_based' => $measurementData['is_weight_based'] ?? false,
-    //         'allow_decimal_qty' => $measurementData['allow_decimal_qty'] ?? false,
-    //         'min_order_qty' => $measurementData['min_order_qty'] ?? 1,
-    //         'max_order_qty' => $measurementData['max_order_qty'] ?? null,
-
-    //         // Add inventory management fields
-    //         'track_inventory' => $inventoryData['track_inventory'] ?? true,
-    //         'allow_backorders' => $inventoryData['allow_backorders'] ?? false,
-    //         'low_stock_threshold' => $inventoryData['low_stock_threshold'] ?? null,
-    //         'enable_stock_alerts' => $inventoryData['enable_stock_alerts'] ?? true,
-    //     ];
-
-    //     // Set USD prices based on exchange rates
-    //     if (isset($data['selling_price'])) {
-    //         $productData['selling_price_usd'] = $this->currencyService->convertNairaToUsd($data['selling_price']);
-    //     }
-
-    //     if (isset($data['discount_price'])) {
-    //         $productData['discount_price_usd'] = $this->currencyService->convertNairaToUsd($data['discount_price']);
-    //     }
-
-    //     // dd($productData);
-
-
-    //     // Create product
-    //     $product = Product::create($productData);
-
-    //     // Handle multiple images
-    //     if (isset($files['multi_images'])) {
-    //         $this->handleMultiImageUpload($files['multi_images'], $product);
-    //     }
-
-    //     return $product;
-    // }
-
+   
     public function createProduct(array $data, array $files)
     {
         // Handle thumbnail upload
@@ -166,87 +96,7 @@ class ProductService
     /**
      * Update an existing product
      */
-    // public function updateProduct(Product $product, array $data, array $files)
-    // {
-    //     // Handle thumbnail update if present
-    //     if (isset($files['product_thumbnail'])) {
-    //         // Delete old thumbnail
-    //         if ($product->product_thumbnail) {
-    //             $oldPath = public_path('uploads/products/thumbnails/' . $product->product_thumbnail);
-    //             if (File::exists($oldPath)) {
-    //                 File::delete($oldPath);
-    //             }
-    //         }
-
-    //         // Upload new thumbnail
-    //         $thumbnailName = $this->handleThumbnailUpload($files['product_thumbnail']);
-    //     } else {
-    //         $thumbnailName = $product->product_thumbnail;
-    //     }
-
-    //     // Prepare measurement unit data
-    //     $measurementData = $this->prepareMeasurementData($data);
-
-
-    //     // Update product data
-    //     $productData = [
-    //         'brand_id' => $data['brand_id'],
-    //         'category_id' => $data['category_id'],
-    //         'subcategory_id' => $data['subcategory_id'],
-    //         'product_name' => $data['product_name'],
-    //         'product_slug' => Str::slug($data['product_name']),
-    //         'product_code' => $data['product_code'],
-    //         'product_qty' => $data['product_qty'],
-    //         'product_tags' => $data['product_tags'] ?? null,
-    //         'product_size' => $data['product_size'] ?? null,
-    //         'product_color' => $data['product_color'] ?? null,
-    //         'selling_price' => $data['selling_price'],
-    //         'discount_price' => $data['discount_price'] ?? null,
-    //         'short_description' => $data['short_description'],
-    //         'long_description' => $data['long_description'],
-    //         'product_thumbnail' => $thumbnailName,
-    //         'vendor_id' => $data['vendor_id'] ?? null,
-    //         'hot_deals' => isset($data['hot_deals']) ? 1 : 0,
-    //         'featured' => isset($data['featured']) ? 1 : 0,
-    //         'special_offer' => isset($data['special_offer']) ? 1 : 0,
-    //         'special_deals' => isset($data['special_deals']) ? 1 : 0,
-    //         'status' => isset($data['status']) ? 1 : 0,
-    //         // Add measurement related fields
-    //         'measurement_unit_id' => $measurementData['measurement_unit_id'] ?? $product->measurement_unit_id,
-    //         'base_unit' => $measurementData['base_unit'] ?? $product->base_unit,
-    //         'conversion_factor' => $measurementData['conversion_factor'] ?? $product->conversion_factor,
-    //         'is_weight_based' => $measurementData['is_weight_based'] ?? $product->is_weight_based,
-    //         'allow_decimal_qty' => $measurementData['allow_decimal_qty'] ?? $product->allow_decimal_qty,
-    //         'min_order_qty' => $measurementData['min_order_qty'] ?? $product->min_order_qty,
-    //         'max_order_qty' => $measurementData['max_order_qty'] ?? $product->max_order_qty,
-
-    //         // Add inventory management fields
-    //         'track_inventory' => $inventoryData['track_inventory'] ?? $product->track_inventory,
-    //         'allow_backorders' => $inventoryData['allow_backorders'] ?? $product->allow_backorders,
-    //         'low_stock_threshold' => $inventoryData['low_stock_threshold'] ?? $product->low_stock_threshold,
-    //         'enable_stock_alerts' => $inventoryData['enable_stock_alerts'] ?? $product->enable_stock_alerts,
-    //     ];
-
-    //     // Set USD prices based on exchange rates
-    //     // Set USD prices based on exchange rates
-    //     if (isset($data['selling_price'])) {
-    //         $productData['selling_price_usd'] = $this->currencyService->convertNairaToUsd($data['selling_price']);
-    //     }
-
-    //     if (isset($data['discount_price'])) {
-    //         $productData['discount_price_usd'] = $this->currencyService->convertNairaToUsd($data['discount_price']);
-    //     }
-
-    //     // Update product
-    //     $product->update($productData);
-
-    //     // Handle multiple images if present
-    //     if (isset($files['multi_images'])) {
-    //         $this->handleMultiImageUpload($files['multi_images'], $product);
-    //     }
-
-    //     return $product;
-    // }
+    
 
     public function updateProduct(Product $product, array $data, array $files)
     {
@@ -494,25 +344,7 @@ class ProductService
     /**
      * Prepare measurement unit data from request
      */
-    // private function prepareMeasurementData(array $data)
-    // {
-    //     $result = [
-    //         'measurement_unit_id' => $data['measurement_unit_id'] ?? null,
-    //         'base_unit' => $data['base_unit'] ?? null,
-    //         'conversion_factor' => $data['conversion_factor'] ?? 1,
-    //         'is_weight_based' => isset($data['is_weight_based']) && $data['is_weight_based'] ? true : false,
-    //         'allow_decimal_qty' => isset($data['allow_decimal_qty']) && $data['allow_decimal_qty'] ? true : false,
-    //         'min_order_qty' => $data['min_order_qty'] ?? 1,
-    //         'max_order_qty' => !empty($data['max_order_qty']) ? $data['max_order_qty'] : null,
-    //     ];
-
-    //     // Auto-populate decimal qty for weight-based products
-    //     if ($result['is_weight_based']) {
-    //         $result['allow_decimal_qty'] = true;
-    //     }
-
-    //     return $result;
-    // }
+  
 
     private function prepareMeasurementData(array $data)
     {

@@ -117,9 +117,11 @@ class VendorProductController extends Controller
         $subcategories = Subcategory::all();
         $currencySymbol = session('currency_symbol', '₦');
         $currency = session('currency', 'NGN');
+        $measurementUnits = MeasurementUnit::where('is_active', true)->get();
 
         return view('vendor.products.edit', compact(
             'product',
+            'measurementUnits',
             'brands',
             'categories',
             'subcategories',

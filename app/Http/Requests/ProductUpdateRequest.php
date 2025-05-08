@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductUpdateRequest extends FormRequest
@@ -12,8 +13,9 @@ class ProductUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'vendor');
     }
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -55,6 +57,11 @@ class ProductUpdateRequest extends FormRequest
              'allow_decimal_qty' => 'nullable|boolean',
              'min_order_qty' => 'nullable|numeric|min:0.01',
              'max_order_qty' => 'nullable|numeric|min:0.01|gt:min_order_qty',
+
+             'track_inventory' => 'nullable|boolean',
+             'allow_backorders' => 'nullable|boolean',
+             'low_stock_threshold' => 'nullable|integer|min:0',
+             'enable_stock_alerts' => 'nullable|boolean',
         ];
     }
 
