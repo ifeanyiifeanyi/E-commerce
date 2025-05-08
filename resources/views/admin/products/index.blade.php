@@ -30,6 +30,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {{-- @dd($products) --}}
                         @forelse($products as $product)
                             <tr>
                                 <td>{{ $product->id }}</td>
@@ -41,16 +42,14 @@
                                 <td>{{ Str::limit($product->product_name, 20) }}</td>
                                 <td>{{ $product->product_code }}</td>
                                 <td>
-                                    @if ($product->discount_price)
-                                        <span class="text-decoration-line-through text-muted">
-                                            ${{ number_format($product->selling_price, 2) }}
-                                        </span>
-                                        <span class="text-danger">
-                                            ${{ number_format($product->discount_price, 2) }}
-                                        </span>
-                                    @else
-                                        ${{ number_format($product->selling_price, 2) }}
+
+                                    <span class="text-success">₦{{ number_format($product->selling_price, 2) }} </span>
+                                        <br>
+                                    @if ($product?->selling_price_usd)
+                                        <span class="text-secondary"> ${{ number_format($product?->selling_price_usd) }} </span>
                                     @endif
+
+
                                 </td>
                                 <td>{{ $product->product_qty }}</td>
 
@@ -61,7 +60,9 @@
                                             {{ $product->status == 1 ? 'checked' : '' }}
                                             value="{{ $product->status == 1 ? '1' : '0' }}" aria-describedby="statusHelp">
 
-                                        <label class="form-check-label badge bg-{{ $product->status === 1 ? 'success' : 'secondary' }}" for="status-{{ $product->id }}">
+                                        <label
+                                            class="form-check-label badge bg-{{ $product->status === 1 ? 'success' : 'secondary' }}"
+                                            for="status-{{ $product->id }}">
                                             {{ $product->status === 1 ? 'Active' : 'Inactive' }}
                                         </label>
                                     </div>
@@ -163,7 +164,8 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Send AJAX request to update status
-                        console.log('Product ID:', productId); // Add this line before the AJAX request
+                        console.log('Product ID:',
+                            productId); // Add this line before the AJAX request
                         $.ajax({
                             url: `/admin/products/${productId}/toggle-status`,
                             type: 'POST',

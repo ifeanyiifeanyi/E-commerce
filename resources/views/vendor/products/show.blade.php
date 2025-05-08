@@ -1,106 +1,22 @@
-@extends('admin.layouts.admin')
+@extends('vendor.layouts.vendor')
 
 @section('title', 'Product Details')
 
-@section('breadcrumb-parent', 'Products')
-@section('breadcrumb-parent-route', route('admin.products'))
-@section('breadcrumb-current', 'Product Details')
-
-@section('styles')
-    <style>
-        .product-badge {
-            font-size: 0.8rem;
-            padding: 0.35em 0.65em;
-            margin-right: 0.5rem;
-        }
-
-        .detail-card {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .detail-card:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-        .detail-header {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
-
-        .image-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 0.5rem;
-        }
-
-        .image-container img {
-            transition: transform 0.3s ease;
-        }
-
-        .image-container:hover img {
-            transform: scale(1.05);
-        }
-
-        .discount-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
-        }
-
-        .action-btn {
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .additional-images {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .property-label {
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .currency-badge {
-            padding: 0.25em 0.5em;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-
-        .stock-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-        }
-
-        .stock-in {
-            background-color: #28a745;
-        }
-
-        .stock-low {
-            background-color: #ffc107;
-        }
-
-        .stock-out {
-            background-color: #dc3545;
-        }
-    </style>
-@endsection
-
-@section('admin-content')
+@section('vendor')
     <div class="container-fluid px-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-flex align-items-center justify-content-between mx-3 mb-4">
+                    <h4 class="mb-0"></h4>
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="{{ route('vendor.products') }}">Products</a></li>
+                            <li class="breadcrumb-item active">Product Details</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Product Header Section -->
         <div class="card detail-card mb-4">
             <div class="card-header detail-header py-3 d-flex justify-content-between align-items-center">
@@ -582,6 +498,102 @@
         @endif
     </div>
 
+@endsection
+
+
+@section('css')
+    <style>
+        .product-badge {
+            font-size: 0.8rem;
+            padding: 0.35em 0.65em;
+            margin-right: 0.5rem;
+        }
+
+        .detail-card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+
+        .image-container img {
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .additional-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .property-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .currency-badge {
+            padding: 0.25em 0.5em;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .stock-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .stock-in {
+            background-color: #28a745;
+        }
+
+        .stock-low {
+            background-color: #ffc107;
+        }
+
+        .stock-out {
+            background-color: #dc3545;
+        }
+    </style>
+@endsection
+
 @section('js')
     <script>
         // Any additional JavaScript can be added here
@@ -590,5 +602,4 @@
             $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
-@endsection
 @endsection

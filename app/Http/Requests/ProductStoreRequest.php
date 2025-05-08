@@ -12,7 +12,7 @@ class ProductStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->role === 'admin';
+        return Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role == 'vendor');
     }
 
     /**
@@ -54,6 +54,12 @@ class ProductStoreRequest extends FormRequest
             'base_unit' => 'nullable|required_if:is_weight_based,true|string|max:255',
             'base_unit' => 'nullable|required_if:allow_decimal_qty,true|string|max:255',
             'base_unit' => 'nullable|required_if:allow_decimal_qty,false|string|max:255',
+
+            'track_inventory' => 'nullable|boolean',
+            'allow_backorders' => 'nullable|boolean',
+            'low_stock_threshold' => 'nullable|integer|min:0',
+            'enable_stock_alerts' => 'nullable|boolean',
+            
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Channels\TwilioChannel;
 
+use App\Services\CurrencyService;
 use Illuminate\Pagination\Paginator;
 use App\Channels\AfricasTalkingChannel;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(CurrencyService::class, function ($app) {
+            return new CurrencyService();
+        });
     }
 
     /**

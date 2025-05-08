@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\CurrencyService;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -17,8 +18,13 @@ class Product extends Model
         'product_tags',
         'product_size',
         'product_color',
+
         'selling_price',
         'discount_price',
+        'selling_price_usd',
+        'discount_price_usd',
+        'default_currency',
+
         'short_description',
         'long_description',
         'product_thumbnail',
@@ -63,6 +69,57 @@ class Product extends Model
         'track_inventory' => 'boolean',
         'stock_last_updated' => 'datetime',
     ];
+
+    /**
+     * Get the price in user's preferred currency
+     *
+     * @return array
+     */
+    public function getCurrentPrice()
+    {
+        $currencyService = app(CurrencyService::class);
+        $userCurrency = $currencyService->getUserCurrency();
+
+        // Get the base price (with discount if available)
+        $price = $this->discount_price ?? $this->selling_price;
+
+        // If user wants USD and we have a USD price stored, use it directly
+        if ($userCurrency == 'USD') {
+            $price = $this->discount_price_usd ?? $this->selling_price_usd ?? $currencyService->convertNairaToUsd($price);
+        }
+
+        return $currencyService->getFormattedPrice($price, $userCurrency);
+    }
+
+
+    /**
+     * Get the formatted price with currency symbol based on user location
+     *
+     * @return string
+     */
+    public function getFormattedPriceWithCurrency()
+    {
+        $price = $this->getCurrentPrice();
+        return $price['formatted'];
+    }
+    /**
+     * Set the USD prices based on current exchange rate
+     */
+    public function setUsdPrices()
+    {
+        $currencyService = app(CurrencyService::class);
+
+        if ($this->selling_price) {
+            $this->selling_price_usd = $currencyService->convertNairaToUsd($this->selling_price);
+        }
+
+        if ($this->discount_price) {
+            $this->discount_price_usd = $currencyService->convertNairaToUsd($this->discount_price);
+        }
+
+        return $this;
+    }
+
 
     // New relationships
     public function inventoryLogs()

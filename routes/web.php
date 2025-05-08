@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\VendorLoginController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Vendor\VendorStoreController;
+use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Admin\MeasurementUnitController;
@@ -287,6 +288,26 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::get('store', 'index')->name('stores');
         Route::post('edit/store', 'update')->name('stores.update');
         Route::get('store/detail', 'show')->name('stores.show');
+    });
+
+    Route::controller(VendorProductController::class)->group(function () {
+
+
+        // API endpoints for product management
+        Route::get('/products/get-subcategories', 'getSubcategories')->name('get.getSubcategories');
+        Route::post('/products/{product}/toggle-status', 'toggleStatus')->name('products.toggle-status');
+        Route::delete('/products/multi-image/{id}', 'deleteMultiImage')->name('products.delete-multi-image');
+
+        Route::get('measurement-units/get-unit-details', 'getUnitDetails')->name('measurement-units.get-unit-details');
+
+        Route::get('products', 'index')->name('products');
+        Route::get('products/create', 'create')->name('products.create');
+        Route::get('products/{product}', 'show')->name('products.show');
+        Route::get('products/edit/{product}', 'edit')->name('products.edit');
+        Route::delete('products/delete/{product}', 'destroy')->name('products.destroy');
+        Route::post('products/store', 'store')->name('products.store');
+        Route::put('products/update/{product}', 'update')->name('products.update');
+
     });
 });
 

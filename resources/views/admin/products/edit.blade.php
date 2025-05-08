@@ -94,32 +94,46 @@
                                 <h6 class="mb-3">Pricing & Inventory</h6>
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="selling_price" class="form-label">Regular Price <span
-                                        class="text-danger">*</span></label>
+                            <div class="form-group col-md-4 mb-3">
+                                <label for="selling_price">Selling Price ({{ $currencySymbol }})</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{{ $currencySymbol }}</span>
+                                    </div>
                                     <input type="number" step="0.01"
                                         class="form-control @error('selling_price') is-invalid @enderror" id="selling_price"
-                                        name="selling_price" value="{{ old('selling_price', $product->selling_price) }}" required>
-                                    @error('selling_price')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                        name="selling_price"
+                                        value="{{ old('selling_price', $product->selling_price ?? '') }}" required>
                                 </div>
+                                @if ($currency === 'NGN')
+                                    <small class="form-text text-muted">
+                                        Price in USD will be calculated automatically based on current exchange rate.
+                                    </small>
+                                @else
+                                    <small class="form-text text-muted">
+                                        Price in NGN will be calculated automatically based on current exchange rate.
+                                    </small>
+                                @endif
+                                @error('selling_price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label for="discount_price" class="form-label">Discount Price</label>
+<div class="form-group col-md-4 mb-3">
+                                <label for="discount_price">Discount Price ({{ $currencySymbol }}) (Optional)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{{ $currencySymbol }}</span>
+                                    </div>
                                     <input type="number" step="0.01"
                                         class="form-control @error('discount_price') is-invalid @enderror"
-                                        id="discount_price" name="discount_price" value="{{ old('discount_price', $product->discount_price) }}">
+                                        id="discount_price" name="discount_price"
+                                        value="{{ old('discount_price', $product->discount_price ?? '') }}">
                                     @error('discount_price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+
 
                             <div class="col-md-4 mb-3">
                                 <label for="product_qty" class="form-label">Quantity <span
@@ -281,7 +295,7 @@
 
                             <div class="col-md-12 mb-3">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="status" name="status"
+                                    <input class="form-check-input" type="checkbox" id="status1" name="status"
                                         value="1" {{ old('status', $product->status) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="status">Active</label>
                                 </div>

@@ -89,7 +89,7 @@
                                 <hr>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            {{-- <div class="col-md-4 mb-3">
                                 <label for="selling_price" class="form-label">Regular Price <span
                                         class="text-danger">*</span></label>
                                 <div class="input-group">
@@ -101,15 +101,57 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+
+                            </div> --}}
+                            <div class="form-group col-md-4 mb-3">
+                                <label for="selling_price">Selling Price ({{ $currencySymbol }})</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{{ $currencySymbol }}</span>
+                                    </div>
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('selling_price') is-invalid @enderror" id="selling_price"
+                                        name="selling_price"
+                                        value="{{ old('selling_price', $product->selling_price ?? '') }}" required>
+                                </div>
+                                @if ($currency === 'NGN')
+                                    <small class="form-text text-muted">
+                                        Price in USD will be calculated automatically based on current exchange rate.
+                                    </small>
+                                @else
+                                    <small class="form-text text-muted">
+                                        Price in NGN will be calculated automatically based on current exchange rate.
+                                    </small>
+                                @endif
+                                @error('selling_price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            {{-- <div class="col-md-4 mb-3">
                                 <label for="discount_price" class="form-label">Discount Price</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
                                     <input type="number" step="0.01"
                                         class="form-control @error('discount_price') is-invalid @enderror"
                                         id="discount_price" name="discount_price" value="{{ old('discount_price') }}">
+                                    @error('discount_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div> --}}
+
+                            <div class="form-group col-md-4 mb-3">
+                                <label for="discount_price">Discount Price ({{ $currencySymbol }}) (Optional)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{{ $currencySymbol }}</span>
+                                    </div>
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('discount_price') is-invalid @enderror"
+                                        id="discount_price" name="discount_price"
+                                        value="{{ old('discount_price', $product->discount_price ?? '') }}">
                                     @error('discount_price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -226,47 +268,47 @@
                                 @enderror
                             </div>
 
-                           <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch mt-4">
-                                    <input class="form-check-input" type="checkbox" id="is_weight_based"
-                                        name="is_weight_based" value="1"
-                                        {{ old('is_weight_based') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_weight_based">Weight Based Product</label>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check form-switch mt-4">
+                                        <input class="form-check-input" type="checkbox" id="is_weight_based"
+                                            name="is_weight_based" value="1"
+                                            {{ old('is_weight_based') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_weight_based">Weight Based Product</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check form-switch mt-4">
+                                        <input class="form-check-input" type="checkbox" id="allow_decimal_qty"
+                                            name="allow_decimal_qty" value="1"
+                                            {{ old('allow_decimal_qty') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="allow_decimal_qty">Allow Decimal
+                                            Quantities</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="min_order_qty" class="form-label">Minimum Order Quantity</label>
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('min_order_qty') is-invalid @enderror"
+                                        id="min_order_qty" name="min_order_qty" value="{{ old('min_order_qty', 1) }}">
+                                    @error('min_order_qty')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="max_order_qty" class="form-label">Maximum Order Quantity</label>
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('max_order_qty') is-invalid @enderror"
+                                        id="max_order_qty" name="max_order_qty" value="{{ old('max_order_qty') }}">
+                                    <small class="form-text text-muted">Leave empty for unlimited</small>
+                                    @error('max_order_qty')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch mt-4">
-                                    <input class="form-check-input" type="checkbox" id="allow_decimal_qty"
-                                        name="allow_decimal_qty" value="1"
-                                        {{ old('allow_decimal_qty') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="allow_decimal_qty">Allow Decimal
-                                        Quantities</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-                                <label for="min_order_qty" class="form-label">Minimum Order Quantity</label>
-                                <input type="number" step="0.01"
-                                    class="form-control @error('min_order_qty') is-invalid @enderror" id="min_order_qty"
-                                    name="min_order_qty" value="{{ old('min_order_qty', 1) }}">
-                                @error('min_order_qty')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-                                <label for="max_order_qty" class="form-label">Maximum Order Quantity</label>
-                                <input type="number" step="0.01"
-                                    class="form-control @error('max_order_qty') is-invalid @enderror" id="max_order_qty"
-                                    name="max_order_qty" value="{{ old('max_order_qty') }}">
-                                <small class="form-text text-muted">Leave empty for unlimited</small>
-                                @error('max_order_qty')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                           </div>
                         </div>
 
                         <div class="row mb-4">
@@ -277,8 +319,7 @@
 
                             <div class="col-md-6 mb-3"
                                 style="cursor: pointer !important; display: flex !important; flex-direction: column !important; align-items: center !important;">
-                                <label
-                                    style="cursor: pointer !important;border: 1px solid #212529c2 !important;
+                                <label style="cursor: pointer !important;border: 1px solid #212529c2 !important;
 "
                                     for="product_thumbnail" class="form-label shadow-lg px-3 py-3">Product Thumbnail <span
                                         class="text-danger">*</span> <br>

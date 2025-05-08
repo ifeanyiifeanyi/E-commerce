@@ -13,7 +13,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link"> <i class="bi bi-bag"></i> Orders </a>
+          <a href="{{ route('vendor.products') }}" class="nav-link"> <i class="bi bi-bag"></i> Products </a>
         </li>
         <li class="nav-item">
           <a href="#" class="nav-link">

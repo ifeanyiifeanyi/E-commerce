@@ -13,6 +13,18 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="">
 
+    <!-- DataTables -->
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}"
+        rel="stylesheet" type="text/css" />
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}"
+        rel="stylesheet" type="text/css" />
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css') }}"
+        rel="stylesheet" type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="{{ asset('adminsrc/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}"
+        rel="stylesheet" type="text/css" />
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
@@ -22,317 +34,7 @@
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .sidebar {
-            background-color: white;
-            min-height: 100vh;
-            border-right: 1px solid #dee2e6;
-            transition: all 0.3s;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            width: 250px;
-        }
-
-        .sidebar-collapsed {
-            margin-left: -250px;
-        }
-
-        .sidebar .nav-link {
-            color: #6c757d;
-            font-size: 0.9rem;
-            padding: 0.625rem 1rem;
-            border-radius: 0.25rem;
-            margin: 0.125rem 0;
-        }
-
-        .sidebar .nav-link:hover {
-            background-color: #f8f9fa;
-            color: #212529;
-        }
-
-        .sidebar .nav-link.active {
-            background-color: #f0f4ff;
-            color: #0d6efd;
-            font-weight: 500;
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-
-        .main-content-expanded {
-            margin-left: 0;
-        }
-
-        .topbar {
-            background-color: #212529;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            width: 100% !important;
-        }
-
-        .search-bar {
-            max-width: 400px;
-        }
-
-        .stat-card {
-            border-radius: 0.5rem;
-            padding: 1rem;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .stat-card h3 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 0;
-        }
-
-        .stat-card p {
-            font-size: 0.85rem;
-            margin-bottom: 0;
-            color: #6c757d;
-        }
-
-        .stat-card i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .pink-bg {
-            background-color: #fdd8e0;
-        }
-
-        .orange-bg {
-            background-color: #ffecd0;
-        }
-
-        .green-bg {
-            background-color: #d1f5ea;
-        }
-
-        .purple-bg {
-            background-color: #e2d9f3;
-        }
-
-        .card {
-            border: none;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-
-        .table th {
-            font-weight: 500;
-            border-top: none;
-        }
-
-        .table td {
-            vertical-align: middle;
-        }
-
-        .support-chat {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-
-        .support-chat-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-weight: 500;
-            box-shadow: 0 0.25rem 0.5rem rgba(40, 167, 69, 0.3);
-        }
-
-        .support-chat-button:hover {
-            background-color: #218838;
-        }
-
-        .footer {
-            background-color: #212529;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            font-size: 0.85rem;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .footer a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        .profile-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: #6c757d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 500;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                margin-left: -250px;
-            }
-
-            .sidebar-expanded {
-                margin-left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .hamburger-menu {
-                display: block;
-            }
-        }
-
-        /* --- Responsive Adjustments --- */
-
-        /* Prevent body scrollbars as a last resort */
-        body {
-            overflow-x: hidden;
-        }
-
-        /* Ensure main content doesn't cause overflow */
-        .main-content {
-            overflow-x: hidden;
-            padding: 1.25rem;
-            /* Default padding */
-        }
-
-        /* Adjust topbar padding */
-        .topbar {
-            padding-left: 1rem;
-            /* Default padding */
-            padding-right: 1rem;
-        }
-
-        /* Allow tables to scroll horizontally if needed */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            /* Smooth scrolling on iOS */
-        }
-
-        /* --- Medium Screens (Tablets, etc.) --- */
-        @media (max-width: 991.98px) {
-            .main-content {
-                padding: 1rem;
-                /* Slightly less padding */
-            }
-
-            /* Ensure search bar is hidden below large screens if needed */
-            .search-bar-container {
-                /* Removed display: none here, rely on d-md-flex */
-            }
-        }
-
-        /* --- Small Screens (Landscape Phones, etc.) --- */
-        @media (max-width: 767.98px) {
-
-            /* No specific changes here, relying on d-md-flex and flex properties */
-            .topbar {
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
-            }
-
-            .search-bar-container {
-                display: none !important;
-                /* Explicitly hide search on smaller than md */
-            }
-        }
-
-        /* --- Extra Small Screens (Portrait Phones) --- */
-        @media (max-width: 575.98px) {
-            .main-content {
-                padding: 0.75rem;
-                /* Even less padding */
-            }
-
-            .topbar {
-                padding-left: 0.5rem;
-                /* Minimal padding */
-                padding-right: 0.5rem;
-            }
-
-            .topbar .btn {
-                /* Reduce padding on all topbar buttons */
-                padding: 0.25rem 0.5rem;
-                font-size: 0.875rem;
-            }
-
-            .topbar .profile-circle {
-                /* Slightly smaller profile circle */
-                width: 32px;
-                height: 32px;
-                font-size: 0.85rem;
-            }
-
-            .topbar .bi-heart,
-            .topbar .bi-cart3 {
-                font-size: 1.1rem;
-                /* Adjust icon size */
-                margin-right: 0.5rem !important;
-                /* Reduce margin */
-            }
-
-            .stat-card h3 {
-                font-size: 1.5rem;
-                /* Slightly smaller font size for stats */
-            }
-
-            .table th,
-            .table td {
-                padding: 0.5rem 0.4rem;
-                /* Reduce table cell padding */
-                white-space: nowrap;
-                /* Prevent wrapping that might cause issues */
-                font-size: 0.85rem;
-                /* Smaller font in tables */
-            }
-
-            h1.h3 {
-                /* Reduce main heading size */
-                font-size: 1.5rem;
-            }
-        }
-    </style>
-
+    <link rel="stylesheet" href="{{ asset('vendorsrc/assets/css/main.css') }}">
     @yield('css')
 </head>
 
@@ -355,10 +57,37 @@
         @include('vendor.layouts.partials.footer')
     </div>
 
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"
+        type="text/css" />
+
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Required datatable js -->
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <!-- Buttons examples -->
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/jszip/jszip.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/pdfmake/build/pdfmake.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/pdfmake/build/vfs_fonts.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
+
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-select/js/dataTables.select.min.js') }}"></script>
+
+    <!-- Responsive examples -->
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('adminsrc/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}">
+    </script>
+
+    <!-- Datatable init js -->
+    <script src="{{ asset('adminsrc/assets/js/pages/datatables.init.js') }}"></script>
 
     <script>
         // Sidebar Toggle Functionality
