@@ -3,7 +3,7 @@
 @section('title', 'My Documents')
 
 @section('vendor')
-    <div class="container-fluid">
+    <div class="container-fluid" style="height: 100vh;">
         <div class="row">
             <div class="col-12">
                 <!-- Document Status Alerts -->
@@ -21,7 +21,7 @@
                                 <h4 class="alert-heading">Required Documents Missing!</h4>
                                 <p>You need to upload the required verification documents to complete your vendor profile.
                                 </p>
-                                <a href="{{ route('vendor.documents') }}" class="btn btn-primary"><i class="fas fa-file-upload"></i> Upload Documents</a>
+                                <a href="{{ route('vendor.documents.create') }}" class="btn btn-primary"><i class="fas fa-file-upload"></i> Upload Documents</a>
                             </div>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                             </div>
                         @else
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped">
+                                <table class="table table-bordered table-striped" id="table">
                                     <thead>
                                         <tr>
                                             <th>Document Type</th>

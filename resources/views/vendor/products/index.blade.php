@@ -3,10 +3,7 @@
 @section('title', 'My Products')
 
 @section('css')
-<!-- DataTables CSS -->
-<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-<!-- Toastr CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" type="text/css" />
+
 @endsection
 
 @section('vendor')
@@ -29,7 +26,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped dt-responsive nowrap w-100" id="datatable">
+                            <table class="table table-striped dt-responsive nowrap w-100" id="datatables">
                                 <thead class="table-light">
                                     <tr>
                                         <th>ID</th>
@@ -126,25 +123,11 @@
 @endsection
 
 @section('js')
-<!-- JQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 <!-- Toastr JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        // Initialize DataTable
-        $('#datatable').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "responsive": true
-        });
 
         // Product status toggle
         $('.product-status').on('change', function() {

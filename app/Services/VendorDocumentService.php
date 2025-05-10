@@ -49,23 +49,26 @@ class VendorDocumentService
                 ];
             }
 
-            // Store the file
-            $path = $request->file('document_file')->store('vendor-documents/' . $user->id);
+            // Store the file in the public folder
+            $path = $request->file('document_file')->store('public/vendor-documents/' . $user->id);
+
+            // Remove 'public/' from the path when saving to database
+            $pathForDatabase = str_replace('public/', '', $path);
 
             VendorDocument::create([
                 'user_id' => $user->id,
                 'document_type' => $request->document_type,
                 'document_number' => $request->document_number,
-                'file_path' => $path,
+                'file_path' => $pathForDatabase,
                 'expiry_date' => $request->expiry_date,
                 'status' => 'pending'
             ]);
 
+            
             return [
                 'status' => 'success',
                 'message' => 'Document uploaded successfully.'
             ];
-
         } catch (\Exception $e) {
             return [
                 'status' => 'error',

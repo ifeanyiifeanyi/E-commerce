@@ -13,17 +13,12 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="">
 
-    <!-- DataTables -->
-    <link href="{{ asset('adminsrc/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}"
-        rel="stylesheet" type="text/css" />
-    <link href="{{ asset('adminsrc/assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}"
-        rel="stylesheet" type="text/css" />
-    <link href="{{ asset('adminsrc/assets/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css') }}"
-        rel="stylesheet" type="text/css" />
-
-    <!-- Responsive datatable examples -->
-    <link href="{{ asset('adminsrc/assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}"
-        rel="stylesheet" type="text/css" />
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet"
+        type="text/css" />
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Bootstrap Icons -->
@@ -33,6 +28,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.4.1/css/all.min.css" rel="stylesheet" />
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"
+        type="text/css" />
 
     <link rel="stylesheet" href="{{ asset('vendorsrc/assets/css/main.css') }}">
     @yield('css')
@@ -58,36 +56,60 @@
     </div>
 
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"
-        type="text/css" />
 
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <!-- Required datatable js -->
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-    <!-- Buttons examples -->
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/jszip/jszip.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/pdfmake/build/pdfmake.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/pdfmake/build/vfs_fonts.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-select/js/dataTables.select.min.js') }}"></script>
 
-    <!-- Responsive examples -->
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
-    <script src="{{ asset('adminsrc/assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize DataTables
+            $('#datatables').DataTable({
+                responsive: true,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search Details...",
+                    emptyTable: "Not available"
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf', 'print'
+                ]
+            });
+
+            $('#table').DataTable({
+                responsive: true,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search ...",
+                    emptyTable: "No records found"
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf', 'print'
+                ],
+                order: [
+                    [0, 'desc']
+                ]
+            });
+        });
     </script>
 
-    <!-- Datatable init js -->
-    <script src="{{ asset('adminsrc/assets/js/pages/datatables.init.js') }}"></script>
 
     <script>
         // Sidebar Toggle Functionality

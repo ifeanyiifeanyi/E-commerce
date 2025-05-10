@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Product;
 use App\Models\VendorDocument;
+use App\Policies\ProductPolicy;
 use Illuminate\Support\Facades\Gate;
 use App\Policies\VendorDocumentPolicy;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         VendorDocument::class => VendorDocumentPolicy::class,
+        Product::class => ProductPolicy::class
     ];
 
     /**
@@ -32,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(VendorDocument::class, VendorDocumentPolicy::class);
+        Gate::policy(Product::class, ProductPolicy::class);
 
     }
 }

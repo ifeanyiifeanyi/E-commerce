@@ -56,4 +56,29 @@ class VendorStoreController extends Controller
         $store = VendorStore::where('user_id', request()->user()->id)->first();
         return view('vendor.store.show', compact('store', 'documents'));
     }
+
+
+    /**
+     * Delete store logo
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteLogo()
+    {
+        $result = $this->storeService->deleteLogo(request()->user()->id);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Delete store banner
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteBanner()
+    {
+        $result = $this->storeService->deleteBanner(request()->user()->id);
+
+        return response()->json($result);
+    }
 }

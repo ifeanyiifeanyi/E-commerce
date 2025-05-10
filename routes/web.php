@@ -182,7 +182,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::delete('vendor/{store}', 'destroy')->name('vendor.stores.destroy');
         Route::get('vendor/{store}/documents', 'documents')->name('vendor.stores.documents');
         Route::post('vendor/{store}/toggle-featured', 'toggleFeatured')->name('vendor.stores.toggle-featured');
-    
+
     });
 
 
@@ -306,6 +306,9 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::get('store', 'index')->name('stores');
         Route::post('edit/store', 'update')->name('stores.update');
         Route::get('store/detail', 'show')->name('stores.show');
+        Route::delete('store/logo/delete', 'deleteLogo')->name('stores.delete.logo');
+        Route::delete('store/banner/delete', 'deleteBanner')->name('stores.delete.banner');
+
     });
 
     Route::controller(VendorProductController::class)->group(function () {

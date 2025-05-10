@@ -89,18 +89,24 @@
                         <div class="col-md-6">
                             <h5>Store Branding</h5>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6 card">
                                     <p><strong>Store Logo</strong></p>
                                     @if($store->store_logo)
-                                        <img src="{{ asset($store->store_logo) }}" alt="Store Logo" class="img-thumbnail" style="max-width: 150px;">
+                                        <div class="text-center">
+                                            <img src="{{ asset($store->store_logo) }}" alt="Store Logo" class="img-thumbnail mb-2" style="max-width: 150px;">
+                                            <button type="button" class="btn btn-sm btn-danger delete-logo-btn">Delete Logo</button>
+                                        </div>
                                     @else
                                         <p class="text-muted">No logo uploaded</p>
                                     @endif
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 card">
                                     <p><strong>Store Banner</strong></p>
                                     @if($store->store_banner)
-                                        <img src="{{ asset($store->store_banner) }}" alt="Store Banner" class="img-thumbnail" style="max-width: 100%;">
+                                        <div class="text-center">
+                                            <img src="{{ asset($store->store_banner) }}" alt="Store Banner" class="img-thumbnail mb-2" style="max-width: 100%;">
+                                            <button type="button" class="btn btn-sm btn-danger delete-banner-btn">Delete Banner</button>
+                                        </div>
                                     @else
                                         <p class="text-muted">No banner uploaded</p>
                                     @endif
@@ -232,6 +238,10 @@
         </div>
     </div>
 </div>
+
+<!-- CSRF Token -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 @endsection
 
 @section('css')
@@ -244,5 +254,103 @@
 @endsection
 
 @section('js')
-<!-- Additional JS -->
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        // Delete Logo
+        $('.delete-logo-btn').on('click', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("vendor.stores.delete.logo") }}',
+                        type: 'DELETE',
+                        success: function(response) {
+                            if(response.success) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.message,
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Error!',
+                                'Something went wrong while processing your request.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+        // Delete Banner
+        $('.delete-banner-btn').on('click', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("vendor.stores.delete.banner") }}',
+                        type: 'DELETE',
+                        success: function(response) {
+                            if(response.success) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    response.message,
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Error!',
+                                'Something went wrong while processing your request.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endsection
