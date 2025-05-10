@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Auth\VendorLoginController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminVendorStoreDetailController;
 use App\Http\Controllers\Vendor\VendorStoreController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorProfileController;
@@ -171,6 +172,23 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::get('vendor/edit/{user}', 'editVendor')->name('vendors.edit');
         Route::put('vendor/update/{user}', 'updateVendor')->name('vendors.update');
     });
+
+    Route::controller(AdminVendorStoreDetailController::class)->group(function(){
+        Route::get('vendor/stores', 'index')->name('vendor.stores');
+        Route::get('vendor/store/{store:store_slug}', 'show')->name('vendor.stores.show');
+
+        Route::post('vendor/{store}/approve', 'approve')->name('vendor.stores.approve');
+        Route::post('vendor/{store}/reject', 'reject')->name('vendor.stores.reject');
+        Route::delete('vendor/{store}', 'destroy')->name('vendor.stores.destroy');
+        Route::get('vendor/{store}/documents', 'documents')->name('vendor.stores.documents');
+        Route::post('vendor/{store}/toggle-featured', 'toggleFeatured')->name('vendor.stores.toggle-featured');
+    
+    });
+
+
+
+
+
 
     Route::controller(ManageVendorDocumentController::class)->group(function () {
         Route::get('vendor/documents/{user?}', 'index')->name('vendors.documents');

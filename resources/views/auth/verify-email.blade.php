@@ -17,21 +17,21 @@
             @endif
 
             <div class="flex justify-between items-center mt-4">
-                <form method="POST" action="{{ route('verification.send') }}">
+                <form method="POST" action="{{ route('verification.send') }}" style="display: inline-block">
                     @csrf
 
                     <div>
                         <x-primary-button>
-                            Resend Verification Email
+                         <div class="fas fa-envelope"></div>   Resend Verification Email
                         </x-primary-button>
                     </div>
                 </form>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" style="display: inline-block">
                     @csrf
 
                     <button type="submit" class="btn btn-warning">
-                        Log Out
+                       <div class="fas fa-sign-out-alt"></div> Log Out
                     </button>
                 </form>
             </div>

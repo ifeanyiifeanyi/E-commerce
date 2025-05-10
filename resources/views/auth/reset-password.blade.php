@@ -11,7 +11,7 @@
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
         <!-- Email Address -->
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="email">Email</label>
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
                 name="email" value="{{ old('email', $request->email) }}" required autocomplete="email" autofocus>
@@ -24,7 +24,7 @@
 
 
         <!-- Password -->
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="password">Password</label>
             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
                 name="password" required autocomplete="new-password">
@@ -37,7 +37,7 @@
 
 
         <!-- Password Confirmation -->
-        <div class="form-group">
+        <div class="form-group mb-4">
             <label for="password_confirmation">Confirm Password</label>
             <input id="password_confirmation" type="password" class="form-control @error('password_confirmation') is-invalid @enderror"
                 name="password_confirmation" required autocomplete="new-password">

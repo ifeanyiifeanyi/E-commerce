@@ -78,7 +78,7 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('admin.vendors') }}">Vendors</a></li>
                         <li><a href="{{ route('admin.create.vendors') }}">Create Vendor</a></li>
-                        <li><a href="{{ route('admin.create.vendors') }}">Vendor Stores</a></li>
+                        <li><a href="{{ route('admin.vendor.stores') }}">Vendor Stores</a></li>
 
                     </ul>
                 </li>

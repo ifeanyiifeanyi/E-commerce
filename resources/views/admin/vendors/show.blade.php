@@ -115,12 +115,12 @@
                                 <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-4 fw-bold">Registered On:</div>
-                                        <div class="col-md-8">{{ $user->created_at->format('M d, Y h:i A') }}</div>
+                                        <div class="col-md-8">{{ $user->created_at?->format('M d, Y h:i A') }}</div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-4 fw-bold">Last Updated:</div>
-                                        <div class="col-md-8">{{ $user->updated_at->format('M d, Y h:i A') }}</div>
+                                        <div class="col-md-8">{{ $user->updated_at?->format('M d, Y h:i A') }}</div>
                                     </div>
 
                                     <div class="row mb-3">
