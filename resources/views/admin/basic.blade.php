@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'Customer Manager Dashboard')
 
 @section('breadcrumb-parent', 'Dashboard')
 @section('breadcrumb-parent-route', route('admin.dashboard'))

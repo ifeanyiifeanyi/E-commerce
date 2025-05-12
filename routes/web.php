@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminCustomerManagerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Vendor\VendorController;
@@ -266,12 +267,27 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
         // Delete multi-image
         Route::delete('/product-multi-image/{id}', 'deleteMultiImage')->name('product.delete.multi-image');
-        Route::post('products/{product}/toggle-status',  'toggleStatus')->name('admin.products.toggle-status');
+        Route::post('products/{product}/toggle-status',  'toggleStatus')->name('products.toggle-status');
 
 
         Route::get('get-brands', 'getBrands')->name('get.brands');
         Route::get('get-vendors', 'getVendors')->name('get.vendors');
         Route::get('get-vendor-documents', 'getVendorDocuments')->name('get.vendor.documents');
+    });
+
+    Route::controller(AdminCustomerManagerController::class)->group(function(){
+        Route::get('customers', 'index')->name('customers');
+        Route::get('customers/{customer}/show', 'show')->name('customers.show');
+        Route::get('customers/{customer}/edit', 'edit')->name('customers.edit');
+        Route::put('customers/{customer}/update', 'update')->name('customers.update');
+        Route::delete('customers/{customer}/delete', 'destroy')->name('customers.destroy');
+
+        Route::get('customers/map-data', 'mapData')->name('customers.map-data');
+        Route::get('products-lists', 'list')->name('products.list');
+        Route::get('products-customer/{product}/show', 'productShow')->name('customer.products.show');
+        Route::post('customers/bulk-email', 'bulkEmail')->name('customers.bulk-email');
+
+        Route::get('customers/export', 'getCustomerExport')->name('customers.export');
     });
 });
 
