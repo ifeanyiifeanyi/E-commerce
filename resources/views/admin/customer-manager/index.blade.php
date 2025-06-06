@@ -20,7 +20,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
@@ -32,7 +32,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
@@ -71,11 +71,13 @@
                         </button>
                     </div>
                 </div>
+                {{-- @dd($customers) --}}
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" id="customersTable">
+                        <table class="table table-hover table-bordered table-striped" id="datatables">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Customer</th>
                                     <th>Registration</th>
                                     <th>Last Login</th>
@@ -87,7 +89,36 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- DataTables will populate this -->
+                                @forelse ($customers as $customer)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ $customer?->getProfilePhotoUrlAttribute() }}" alt="{{ $customer->name }}"
+                                                    class="rounded-circle me-2" width="40" height="40">
+                                                {{ $customer->name }}
+                                            </div>
+                                        </td>
+                                        <td>{{ $customer->created_at?->format('d M Y') }}</td>
+                                        <td>{{ $customer->last_login_at ? $customer->last_login_at->diffForHumans() : 'N/A' }}</td>
+                                        <td>{{ number_format($customer->orders_count) }}</td>
+                                        <td>{{ $customer->country ?: 'Unknown' }}</td>
+                                        <td>{{ ucfirst($customer->account_status) }}</td>
+                                        <td>{{ ucfirst($customer->customer_segment) }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary send-email-btn" data-id="{{ $customer->id }}">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger delete-customer-btn" data-id="{{ $customer->id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center">No customers found.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -109,13 +140,14 @@
 
         <!-- Top Countries Card -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Top Countries</h5>
                 </div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
-                        @foreach($customersByCountry as $country)
+                        {{-- @dd($customersByCountry) --}}
+                        @foreach ($customersByCountry as $country)
                             <div class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
                                     <span class="flag-icon flag-icon-{{ strtolower($country->country) }}"></span>
@@ -242,7 +274,8 @@
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to delete this customer? This action cannot be undone.</p>
-                    <p class="text-danger">All customer data, including orders, addresses, and activity history will be permanently deleted.</p>
+                    <p class="text-danger">All customer data, including orders, addresses, and activity history will be
+                        permanently deleted.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -253,250 +286,288 @@
     </div>
 @endsection
 
-@push('scripts')
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js"></script>
+@section('js')
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js"></script>
 
-<script>
-    $(document).ready(function() {
-        // Initialize DataTables
-        var customersTable = $('#customersTable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('admin.customers') }}",
-            columns: [
-                {data: 'name', name: 'name'},
-                {data: 'registration_date', name: 'created_at'},
-                {data: 'last_login', name: 'last_login_at'},
-                {data: 'orders', name: 'orders', orderable: false, searchable: false},
-                {data: 'location', name: 'country'},
-                {data: 'status', name: 'account_status'},
-                {data: 'segment', name: 'customer_segment'},
-                {data: 'actions', name: 'actions', orderable: false, searchable: false}
-            ],
-            order: [[1, 'desc']]
-        });
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTables
+            var customersTable = $('#customersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('admin.customers') }}",
+                columns: [{
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'registration_date',
+                        name: 'created_at'
+                    },
+                    {
+                        data: 'last_login',
+                        name: 'last_login_at'
+                    },
+                    {
+                        data: 'orders',
+                        name: 'orders',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'location',
+                        name: 'country'
+                    },
+                    {
+                        data: 'status',
+                        name: 'account_status'
+                    },
+                    {
+                        data: 'segment',
+                        name: 'customer_segment'
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                order: [
+                    [1, 'desc']
+                ]
+            });
 
-        // Initialize customer map
-        var customerMap = L.map('customerMap').setView([20, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(customerMap);
+            // Initialize customer map
+            var customerMap = L.map('customerMap').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(customerMap);
 
-        // Load customer locations via AJAX
-        $.ajax({
-            url: "{{ route('admin.customers.map-data') }}",
-            method: 'GET',
-            success: function(response) {
-                if (response.success) {
-                    response.data.forEach(function(customer) {
-                        if (customer.latitude && customer.longitude) {
-                            L.marker([customer.latitude, customer.longitude])
-                                .addTo(customerMap)
-                                .bindPopup(`<b>${customer.name}</b><br>${customer.email}<br>${customer.formatted_location}`);
-                        }
-                    });
-                }
-            }
-        });
-
-        // Load products for email recommendations
-        $('select[name="email_type"]').change(function() {
-            if ($(this).val() === 'product_recommendation') {
-                $('.product-recommendations-section, .single-product-recommendations-section').show();
-                loadProducts();
-            } else {
-                $('.product-recommendations-section, .single-product-recommendations-section').hide();
-            }
-        });
-
-        function loadProducts() {
+            // Load customer locations via AJAX
             $.ajax({
-                url: "{{ route('admin.products.list') }}",
+                url: "{{ route('admin.customers.map-data') }}",
                 method: 'GET',
                 success: function(response) {
                     if (response.success) {
-                        var options = '';
-                        response.data.forEach(function(product) {
-                            options += `<option value="${product.id}">${product.name} - ₦${product.price}</option>`;
+                        response.data.forEach(function(customer) {
+                            if (customer.latitude && customer.longitude) {
+                                L.marker([customer.latitude, customer.longitude])
+                                    .addTo(customerMap)
+                                    .bindPopup(
+                                        `<b>${customer.name}</b><br>${customer.email}<br>${customer.formatted_location}`
+                                    );
+                            }
                         });
-                        $('select[name="products[]"], select[name="product_ids[]"]').html(options);
                     }
                 }
             });
+
+            // Load products for email recommendations
+            $('select[name="email_type"]').change(function() {
+                if ($(this).val() === 'product_recommendation') {
+                    $('.product-recommendations-section, .single-product-recommendations-section').show();
+                    loadProducts();
+                } else {
+                    $('.product-recommendations-section, .single-product-recommendations-section').hide();
+                }
+            });
+
+            function loadProducts() {
+                $.ajax({
+                    url: "{{ route('admin.products.list') }}",
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            var options = '';
+                            response.data.forEach(function(product) {
+                                options +=
+                                    `<option value="${product.id}">${product.name} - ₦${product.price}</option>`;
+                            });
+                            $('select[name="products[]"], select[name="product_ids[]"]').html(options);
+                        }
+                    }
+                });
+            }
+
+            // Initialize Select2
+            $('select[name="products[]"], select[name="product_ids[]"]').select2({
+                placeholder: 'Select products',
+                width: '100%'
+            });
+
+            // Send bulk email
+            $('#sendBulkEmailBtn').click(function() {
+                var formData = $('#bulkEmailForm').serialize();
+                $.ajax({
+                    url: "{{ route('admin.customers.bulk-email') }}",
+                    method: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#sendBulkEmailBtn').html(
+                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...'
+                        );
+                        $('#sendBulkEmailBtn').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $('#bulkEmailModal').modal('hide');
+                            $('#bulkEmailForm')[0].reset();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error('An error occurred while sending emails');
+                        console.error(xhr.responseText);
+                    },
+                    complete: function() {
+                        $('#sendBulkEmailBtn').html('Send Emails');
+                        $('#sendBulkEmailBtn').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Open single email modal
+            $(document).on('click', '.send-email-btn', function() {
+                var customerId = $(this).data('id');
+                $('#emailCustomerId').val(customerId);
+                $('#singleEmailModal').modal('show');
+            });
+
+            // Send single email
+            $('#sendSingleEmailBtn').click(function() {
+                var customerId = $('#emailCustomerId').val();
+                var formData = $('#singleEmailForm').serialize();
+
+                $.ajax({
+                    url: `/admin/customers/${customerId}/email`,
+                    method: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#sendSingleEmailBtn').html(
+                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...'
+                        );
+                        $('#sendSingleEmailBtn').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $('#singleEmailModal').modal('hide');
+                            $('#singleEmailForm')[0].reset();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error('An error occurred while sending email');
+                        console.error(xhr.responseText);
+                    },
+                    complete: function() {
+                        $('#sendSingleEmailBtn').html('Send Email');
+                        $('#sendSingleEmailBtn').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Open delete confirmation modal
+            $(document).on('click', '.delete-customer-btn', function() {
+                var customerId = $(this).data('id');
+                $('#confirmDeleteBtn').data('id', customerId);
+                $('#deleteCustomerModal').modal('show');
+            });
+
+            // Confirm delete customer
+            $('#confirmDeleteBtn').click(function() {
+                var customerId = $(this).data('id');
+
+                $.ajax({
+                    url: `/admin/customers/${customerId}`,
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#confirmDeleteBtn').html(
+                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...'
+                        );
+                        $('#confirmDeleteBtn').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $('#deleteCustomerModal').modal('hide');
+                            customersTable.ajax.reload();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error('An error occurred while deleting customer');
+                        console.error(xhr.responseText);
+                    },
+                    complete: function() {
+                        $('#confirmDeleteBtn').html('Delete Customer');
+                        $('#confirmDeleteBtn').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Export customers
+            $('#exportCustomersBtn').click(function() {
+                window.location.href = "{{ route('admin.customers.export') }}";
+            });
+        });
+    </script>
+@endsection
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.6.6/css/flag-icons.min.css">
+    <style>
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: #fff;
         }
 
-        // Initialize Select2
-        $('select[name="products[]"], select[name="product_ids[]"]').select2({
-            placeholder: 'Select products',
-            width: '100%'
-        });
+        .fas-user-check,
+        .fas-user-plus,
+        .fas-globe,
+        .fas-users {
+            font-size: 1.5rem !important;
+            color: #fff !important;
 
-        // Send bulk email
-        $('#sendBulkEmailBtn').click(function() {
-            var formData = $('#bulkEmailForm').serialize();
-            $.ajax({
-                url: "{{ route('admin.customers.bulk-email') }}",
-                method: 'POST',
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    $('#sendBulkEmailBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
-                    $('#sendBulkEmailBtn').prop('disabled', true);
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        $('#bulkEmailModal').modal('hide');
-                        $('#bulkEmailForm')[0].reset();
-                    } else {
-                        toastr.error(response.message || 'An error occurred');
-                    }
-                },
-                error: function(xhr) {
-                    toastr.error('An error occurred while sending emails');
-                    console.error(xhr.responseText);
-                },
-                complete: function() {
-                    $('#sendBulkEmailBtn').html('Send Emails');
-                    $('#sendBulkEmailBtn').prop('disabled', false);
-                }
-            });
-        });
+        }
 
-        // Open single email modal
-        $(document).on('click', '.send-email-btn', function() {
-            var customerId = $(this).data('id');
-            $('#emailCustomerId').val(customerId);
-            $('#singleEmailModal').modal('show');
-        });
+        .avatar-lg {
+            width: 64px;
+            height: 64px;
+        }
 
-        // Send single email
-        $('#sendSingleEmailBtn').click(function() {
-            var customerId = $('#emailCustomerId').val();
-            var formData = $('#singleEmailForm').serialize();
-            
-            $.ajax({
-                url: `/admin/customers/${customerId}/email`,
-                method: 'POST',
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    $('#sendSingleEmailBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
-                    $('#sendSingleEmailBtn').prop('disabled', true);
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        $('#singleEmailModal').modal('hide');
-                        $('#singleEmailForm')[0].reset();
-                    } else {
-                        toastr.error(response.message || 'An error occurred');
-                    }
-                },
-                error: function(xhr) {
-                    toastr.error('An error occurred while sending email');
-                    console.error(xhr.responseText);
-                },
-                complete: function() {
-                    $('#sendSingleEmailBtn').html('Send Email');
-                    $('#sendSingleEmailBtn').prop('disabled', false);
-                }
-            });
-        });
+        .card-header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
 
-        // Open delete confirmation modal
-        $(document).on('click', '.delete-customer-btn', function() {
-            var customerId = $(this).data('id');
-            $('#confirmDeleteBtn').data('id', customerId);
-            $('#deleteCustomerModal').modal('show');
-        });
-
-        // Confirm delete customer
-        $('#confirmDeleteBtn').click(function() {
-            var customerId = $(this).data('id');
-            
-            $.ajax({
-                url: `/admin/customers/${customerId}`,
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    $('#confirmDeleteBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
-                    $('#confirmDeleteBtn').prop('disabled', true);
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        $('#deleteCustomerModal').modal('hide');
-                        customersTable.ajax.reload();
-                    } else {
-                        toastr.error(response.message || 'An error occurred');
-                    }
-                },
-                error: function(xhr) {
-                    toastr.error('An error occurred while deleting customer');
-                    console.error(xhr.responseText);
-                },
-                complete: function() {
-                    $('#confirmDeleteBtn').html('Delete Customer');
-                    $('#confirmDeleteBtn').prop('disabled', false);
-                }
-            });
-        });
-
-        // Export customers
-        $('#exportCustomersBtn').click(function() {
-            window.location.href = "{{ route('admin.customers.export') }}";
-        });
-    });
-</script>
-@endpush
-
-@push('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.6.6/css/flag-icons.min.css">
-<style>
-    .avatar {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        color: #fff;
-    }
-
-    .fas-user-check,
-    .fas-user-plus,
-    .fas-globe,
-    .fas-users {
-        font-size: 1.5rem !important;
-        color: #fff !important;
-
-    }
-    
-    .avatar-lg {
-        width: 64px;
-        height: 64px;
-    }
-    
-    .card-header-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    #customerMap {
-        border-radius: 0.25rem;
-    }
-</style>
-@endpush
+        #customerMap {
+            border-radius: 0.25rem;
+        }
+    </style>
+@endsection

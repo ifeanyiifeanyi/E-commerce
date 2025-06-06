@@ -27,6 +27,7 @@
     <link href="{{ asset('adminsrc/assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     {{-- Add SweetAlert2 CSS --}}
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
     @yield('css')
 </head>
 

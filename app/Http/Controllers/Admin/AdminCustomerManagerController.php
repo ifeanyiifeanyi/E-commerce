@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\CustomerActivityLog;
-use App\Models\CustomerEmailCampaign;
-use App\Models\CustomerLoginHistory;
-use App\Models\CustomerNotification;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
-use App\Services\CustomerEmailService;
-use App\Services\LocationService;
 use Illuminate\Http\Request;
+use App\Services\LocationService;
+use App\Mail\CustomerGeneralEmail;
 use Illuminate\Support\Facades\DB;
+use App\Models\CustomerActivityLog;
+use App\Http\Controllers\Controller;
+use App\Models\CustomerLoginHistory;
+use App\Models\CustomerNotification;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Models\CustomerEmailCampaign;
+use App\Services\CustomerEmailService;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 
 class AdminCustomerManagerController extends Controller
 {
@@ -34,82 +36,9 @@ class AdminCustomerManagerController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $customers = User::where('role', '!=', 'admin')
-                ->where('role', '!=', 'vendor')
-                ->select(['id', 'name', 'email', 'phone', 'country', 'status', 'created_at', 'last_login_at', 'account_status', 'customer_segment']);
+            $customers = User::activeCustomers()
+                ->select(['id', 'name', 'email', 'phone', 'country', 'status', 'created_at', 'last_login_at', 'account_status', 'customer_segment'])->simplePaginate(100);
 
-            return DataTables::of($customers)
-                ->addColumn('profile_photo', function($customer) {
-                    return '<img src="' . $customer->profile_photo_url . '" class="avatar" width="40" height="40">';
-                })
-                ->addColumn('name', function($customer) {
-                    return '<div class="d-flex align-items-center">
-                                <div class="avatar avatar-md me-2">
-                                    <img src="' . $customer->profile_photo_url . '">
-                                </div>
-                                <div>
-                                    <strong>' . $customer->name . '</strong>
-                                    <div class="text-muted small">' . $customer->email . '</div>
-                                </div>
-                            </div>';
-                })
-                ->addColumn('registration_date', function($customer) {
-                    return $customer->created_at->format('M d, Y');
-                })
-                ->addColumn('last_login', function($customer) {
-                    return $customer->last_login_at ? $customer->last_login_at->diffForHumans() : 'Never';
-                })
-                ->addColumn('orders', function($customer) {
-                    $orderCount = Order::where('user_id', $customer->id)->count();
-                    $totalSpent = Order::where('user_id', $customer->id)
-                        ->where('payment_status', 'paid')
-                        ->sum('total_amount');
-                    
-                    return '<div class="text-center">
-                                <div>' . number_format($orderCount) . '</div>
-                                <div class="text-muted small">₦' . number_format($totalSpent, 2) . '</div>
-                            </div>';
-                })
-                ->addColumn('location', function($customer) {
-                    $location = [];
-                    if ($customer->city) $location[] = $customer->city;
-                    if ($customer->country) $location[] = $customer->country;
-                    
-                    return !empty($location) ? implode(', ', $location) : 'Unknown';
-                })
-                ->addColumn('status', function($customer) {
-                    $statusClass = [
-                        'active' => 'success',
-                        'inactive' => 'warning',
-                        'suspended' => 'danger',
-                        'banned' => 'dark',
-                    ][$customer->account_status] ?? 'secondary';
-                    
-                    return '<span class="badge bg-' . $statusClass . '">' . ucfirst($customer->account_status) . '</span>';
-                })
-                ->addColumn('segment', function($customer) {
-                    $segmentClass = [
-                        'vip' => 'primary',
-                        'regular' => 'info',
-                        'new' => 'success',
-                        'at_risk' => 'warning',
-                        'dormant' => 'secondary',
-                    ][$customer->customer_segment] ?? 'secondary';
-                    
-                    return '<span class="badge bg-' . $segmentClass . '">' . ucfirst($customer->customer_segment) . '</span>';
-                })
-                ->addColumn('actions', function($customer) {
-                    return '<div class="d-flex">
-                                <a href="' . route('admin.customers.show', $customer->id) . '" class="btn btn-sm btn-info me-1" title="View"><i class="bi bi-eye"></i></a>
-                                <a href="' . route('admin.customers.edit', $customer->id) . '" class="btn btn-sm btn-primary me-1" title="Edit"><i class="bi bi-pencil"></i></a>
-                                <button type="button" class="btn btn-sm btn-success me-1 send-email-btn" data-id="' . $customer->id . '" title="Send Email"><i class="bi bi-envelope"></i></button>
-                                <button type="button" class="btn btn-sm btn-danger delete-customer-btn" data-id="' . $customer->id . '" title="Delete"><i class="bi bi-trash"></i></button>
-                            </div>';
-                })
-                ->rawColumns(['profile_photo', 'name', 'orders', 'status', 'segment', 'actions'])
-                ->make(true);
-        }
 
         $totalCustomers = User::where('role', '!=', 'admin')->where('role', '!=', 'vendor')->count();
         $activeCustomers = User::where('role', '!=', 'admin')->where('role', '!=', 'vendor')->where('account_status', 'active')->count();
@@ -125,9 +54,10 @@ class AdminCustomerManagerController extends Controller
             ->get();
 
         return view('admin.customer-manager.index', compact(
-            'totalCustomers', 
-            'activeCustomers', 
-            'newCustomersThisMonth', 
+            'customers',
+            'totalCustomers',
+            'activeCustomers',
+            'newCustomersThisMonth',
             'customersByCountry'
         ));
     }
@@ -142,36 +72,36 @@ class AdminCustomerManagerController extends Controller
             ->latest()
             ->limit(10)
             ->get();
-        
+
         // Get login history
         $loginHistory = CustomerLoginHistory::where('user_id', $customer->id)
             ->latest()
             ->limit(10)
             ->get();
-        
+
         // Get activity logs
         $activityLogs = CustomerActivityLog::where('user_id', $customer->id)
             ->latest()
             ->limit(10)
             ->get();
-        
+
         // Get email history
         $emailHistory = CustomerEmailCampaign::where('user_id', $customer->id)
             ->latest()
             ->limit(10)
             ->get();
-        
+
         // Calculate lifetime value
         $lifetimeValue = Order::where('user_id', $customer->id)
             ->where('payment_status', 'paid')
             ->sum('total_amount');
-        
+
         // Calculate days since registration
         $daysSinceRegistration = $customer->created_at->diffInDays(now());
-        
+
         // Get addresses
         $addresses = $customer->addresses;
-        
+
         // Get latest notification
         $latestNotification = CustomerNotification::where('user_id', $customer->id)
             ->latest()
@@ -191,14 +121,6 @@ class AdminCustomerManagerController extends Controller
     }
 
     /**
-     * Display form to edit customer
-     */
-    public function edit(User $customer)
-    {
-        return view('admin.customer-manager.edit', compact('customer'));
-    }
-
-    /**
      * Update customer information
      */
     public function update(Request $request, User $customer)
@@ -208,7 +130,7 @@ class AdminCustomerManagerController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $customer->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100', 
+            'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
@@ -313,7 +235,7 @@ class AdminCustomerManagerController extends Controller
             $this->emailService->sendProductRecommendations($customer, $products->toArray(), $request->subject);
         } else {
             // Send general email
-            \Mail::to($customer)->send(new \App\Mail\CustomerGeneralEmail(
+            Mail::to($customer)->send(new CustomerGeneralEmail(
                 $customer,
                 $request->subject,
                 $request->message,
@@ -479,7 +401,7 @@ class AdminCustomerManagerController extends Controller
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
-        
+
         // Get customers by country
         $customersByCountry = User::where('role', '!=', 'admin')->where('role', '!=', 'vendor')
             ->select('country', DB::raw('count(*) as total'))
@@ -487,14 +409,14 @@ class AdminCustomerManagerController extends Controller
             ->orderByDesc('total')
             ->limit(10)
             ->get();
-        
+
         // Get customers by device type
         $customersByDevice = CustomerLoginHistory::select('device_type', DB::raw('count(distinct user_id) as total'))
             ->groupBy('device_type')
             ->orderByDesc('total')
             ->limit(5)
             ->get();
-        
+
         // Get customer growth trend
         $customerGrowth = User::where('role', '!=', 'admin')->where('role', '!=', 'vendor')
             ->select(DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'), DB::raw('count(*) as total'))
@@ -502,7 +424,7 @@ class AdminCustomerManagerController extends Controller
             ->groupBy('month')
             ->orderBy('month')
             ->get();
-        
+
         return response()->json([
             'success' => true,
             'data' => [

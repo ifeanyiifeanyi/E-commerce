@@ -8,7 +8,8 @@
         "php": "^8.2",
         "africastalking/africastalking": "^3.0",
         "bacon/bacon-qr-code": "^3.0",
-        "intervention/image": "^3.0",
+        "intervention/image": "^3.11",
+        "intervention/image-laravel": "^1.5",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
@@ -16,7 +17,8 @@
         "spatie/laravel-activitylog": "^4.10",
         "torann/geoip": "^3.0",
         "twilio/sdk": "^8.5",
-        "wisdom-diala/countrypkg-laravel": "^1.0"
+        "wisdom-diala/countrypkg-laravel": "^1.0",
+        "yabacon/paystack-php": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

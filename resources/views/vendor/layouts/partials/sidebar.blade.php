@@ -21,8 +21,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="bi bi-tag"></i> Promotions
+          <a href="{{ route('vendor.advertisement') }}" class="nav-link {{ request()->routeIs('vendor.advertisement*') ? 'active' : '' }}">
+            <i class="bi bi-tag"></i> ADS Management
           </a>
         </li>
         <li class="nav-item">

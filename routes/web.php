@@ -6,7 +6,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\AdminCustomerManagerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Vendor\VendorController;
@@ -15,8 +14,8 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Auth\VendorLoginController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\AdminProfileController;
-use App\Http\Controllers\Admin\AdminVendorStoreDetailController;
 use App\Http\Controllers\Vendor\VendorStoreController;
+use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -24,10 +23,13 @@ use App\Http\Controllers\Admin\MeasurementUnitController;
 use App\Http\Controllers\Vendor\VendorDocumentController;
 use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\Auth\VendorRegistrationController;
+use App\Http\Controllers\Admin\AdminCustomerManagerController;
 use App\Http\Controllers\Admin\ManageVendorDocumentController;
+use App\Http\Controllers\Admin\AdminVendorStoreDetailController;
+use App\Http\Controllers\Vendor\VendorAdvertisementController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 
 
@@ -127,6 +129,18 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::get('logout', 'logout')->name('logout');
     });
 
+    Route::controller(AdvertisementController::class)->group(function () {
+        Route::get('advertisement-packages', 'index')->name('advertisement.packages');
+        Route::get('advertisement-packages/create', 'create')->name('advertisement.packages.create');
+        Route::post('advertisement-packages/store', 'store')->name('advertisement.packages.store');
+        Route::get('advertisement-packages/{package}/show', 'show')->name('advertisement.packages.show');
+        Route::get('advertisement-packages/{package}/edit', 'edit')->name('advertisement.packages.edit');
+        Route::put('advertisement-packages/{package}/update', 'update')->name('advertisement.packages.update');
+        Route::delete('advertisement-packages/{package}/delete', 'destroy')->name('advertisement.packages.destroy');
+
+        // Route::post('/vendor/advertisements/{vendor}', 'vendorAdvertisements')->name('vendor.advertisements');
+    });
+
     Route::controller(AdminProfileController::class)->group(function () {
         Route::get('profile', 'index')->name('profile');
         Route::put('update-profile', 'update')->name('profile.update');
@@ -174,7 +188,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::put('vendor/update/{user}', 'updateVendor')->name('vendors.update');
     });
 
-    Route::controller(AdminVendorStoreDetailController::class)->group(function(){
+    Route::controller(AdminVendorStoreDetailController::class)->group(function () {
         Route::get('vendor/stores', 'index')->name('vendor.stores');
         Route::get('vendor/store/{store:store_slug}', 'show')->name('vendor.stores.show');
 
@@ -183,7 +197,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::delete('vendor/{store}', 'destroy')->name('vendor.stores.destroy');
         Route::get('vendor/{store}/documents', 'documents')->name('vendor.stores.documents');
         Route::post('vendor/{store}/toggle-featured', 'toggleFeatured')->name('vendor.stores.toggle-featured');
-
     });
 
 
@@ -275,7 +288,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::get('get-vendor-documents', 'getVendorDocuments')->name('get.vendor.documents');
     });
 
-    Route::controller(AdminCustomerManagerController::class)->group(function(){
+    Route::controller(AdminCustomerManagerController::class)->group(function () {
         Route::get('customers', 'index')->name('customers');
         Route::get('customers/{customer}/show', 'show')->name('customers.show');
         Route::get('customers/{customer}/edit', 'edit')->name('customers.edit');
@@ -324,7 +337,6 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::get('store/detail', 'show')->name('stores.show');
         Route::delete('store/logo/delete', 'deleteLogo')->name('stores.delete.logo');
         Route::delete('store/banner/delete', 'deleteBanner')->name('stores.delete.banner');
-
     });
 
     Route::controller(VendorProductController::class)->group(function () {
@@ -344,7 +356,29 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
         Route::delete('products/delete/{product}', 'destroy')->name('products.destroy');
         Route::post('products/store', 'store')->name('products.store');
         Route::put('products/update/{product}', 'update')->name('products.update');
+    });
 
+    Route::controller(VendorAdvertisementController::class)->group(function () {
+        Route::get('advertisment', 'index')->name('advertisement');
+        Route::get('advertisment/create', 'create')->name('advertisements.create');
+        Route::get('advertisment/{advertisment}', 'show')->name('advertisements.show');
+        Route::get('advertisment/{advertisment}/edit', 'edit')->name('advertisements.edit');
+        Route::put('advertisment/{advertisment}', 'update')->name('advertisements.update');
+        Route::delete('advertisment/{advertisment}', 'destroy')->name('advertisements.destroy');
+
+        Route::get('advertisment/subscribe/{packageId?}', 'subscribe')->name('advertisements.subscribe');
+        Route::post('advertisment/store', 'store')->name('advertisements.process-subscription');
+
+        // call back
+        Route::get('/advertisements/payment/callback',  'paymentCallback')
+            ->name('advertisements.payment.callback');
+
+        Route::get('advert/packages', 'packages')->name('advertisements.packages');
+        Route::get('packages/{package}', 'showPackage')->name('advertisements.package.show');
+
+        // Cancellation routes
+        Route::get('/{advertisement}/cancel', 'showCancelForm')->name('advertisements.cancel.form');
+        Route::post('/{advertisement}/cancel', 'cancel')->name('advertisements.cancel');
     });
 });
 

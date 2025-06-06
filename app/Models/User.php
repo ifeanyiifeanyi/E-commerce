@@ -116,6 +116,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(VendorDocument::class);
     }
 
+    public function products(){
+        return $this->hasMany(Product::class, 'vendor_id');
+    }
+
+    public function scopeActiveCustomers($query)
+    {
+        return $query->where('role', 'user')
+            ->where('account_status', 'active');
+    }
+
     public function isVendor(): bool
     {
         return $this->role === 'vendor';
@@ -134,6 +144,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public static function getAdminMembers()
     {
         return self::where('role', 'admin')->get()->toArray();
+    }
+    public function hasRole(array $role): bool
+    {
+        return in_array($this->role, $role);
     }
 
     /**

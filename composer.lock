@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "077ed5dabf08047e7814483bf1ee15c6",
+    "content-hash": "58ee10f761586a843dcc41129ad1cbaf",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -1283,16 +1283,16 @@
         },
         {
             "name": "intervention/image",
-            "version": "3.11.2",
+            "version": "3.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Intervention/image.git",
-                "reference": "ebbb711871fb261c064cf4c422f5f3c124fe1842"
+                "reference": "d0f097b8a3fa8fb758efc9440b513aa3833cda17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Intervention/image/zipball/ebbb711871fb261c064cf4c422f5f3c124fe1842",
-                "reference": "ebbb711871fb261c064cf4c422f5f3c124fe1842",
+                "url": "https://api.github.com/repos/Intervention/image/zipball/d0f097b8a3fa8fb758efc9440b513aa3833cda17",
+                "reference": "d0f097b8a3fa8fb758efc9440b513aa3833cda17",
                 "shasum": ""
             },
             "require": {
@@ -1339,7 +1339,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Intervention/image/issues",
-                "source": "https://github.com/Intervention/image/tree/3.11.2"
+                "source": "https://github.com/Intervention/image/tree/3.11.3"
             },
             "funding": [
                 {
@@ -1355,7 +1355,91 @@
                     "type": "ko_fi"
                 }
             ],
-            "time": "2025-02-27T13:08:55+00:00"
+            "time": "2025-05-22T17:26:23+00:00"
+        },
+        {
+            "name": "intervention/image-laravel",
+            "version": "1.5.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Intervention/image-laravel.git",
+                "reference": "056029431400a5cc56036172787a578f334683c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Intervention/image-laravel/zipball/056029431400a5cc56036172787a578f334683c4",
+                "reference": "056029431400a5cc56036172787a578f334683c4",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^8|^9|^10|^11|^12",
+                "illuminate/routing": "^8|^9|^10|^11|^12",
+                "illuminate/support": "^8|^9|^10|^11|^12",
+                "intervention/image": "^3.11",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "ext-fileinfo": "*",
+                "orchestra/testbench": "^8.18 || ^9.9",
+                "phpunit/phpunit": "^10.0 || ^11.0 || ^12.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Image": "Intervention\\Image\\Laravel\\Facades\\Image"
+                    },
+                    "providers": [
+                        "Intervention\\Image\\Laravel\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Intervention\\Image\\Laravel\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oliver Vogel",
+                    "email": "oliver@intervention.io",
+                    "homepage": "https://intervention.io/"
+                }
+            ],
+            "description": "Laravel Integration of Intervention Image",
+            "homepage": "https://image.intervention.io/",
+            "keywords": [
+                "gd",
+                "image",
+                "imagick",
+                "laravel",
+                "resize",
+                "thumbnail",
+                "watermark"
+            ],
+            "support": {
+                "issues": "https://github.com/Intervention/image-laravel/issues",
+                "source": "https://github.com/Intervention/image-laravel/tree/1.5.6"
+            },
+            "funding": [
+                {
+                    "url": "https://paypal.me/interventionio",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/Intervention",
+                    "type": "github"
+                },
+                {
+                    "url": "https://ko-fi.com/interventionphp",
+                    "type": "ko_fi"
+                }
+            ],
+            "time": "2025-04-04T15:09:55+00:00"
         },
         {
             "name": "jaybizzle/crawler-detect",
@@ -6702,6 +6786,79 @@
                 "source": "https://github.com/wisdom-diala/countrypkg-laravel/tree/1.0.7"
             },
             "time": "2023-03-20T13:37:17+00:00"
+        },
+        {
+            "name": "yabacon/paystack-php",
+            "version": "v2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yabacon/paystack-php.git",
+                "reference": "8097917f304bc40a3eaa5c3eb25c292331f85083"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yabacon/paystack-php/zipball/8097917f304bc40a3eaa5c3eb25c292331f85083",
+                "reference": "8097917f304bc40a3eaa5c3eb25c292331f85083",
+                "shasum": ""
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^6.2",
+                "phpunit/phpunit": "~5.3",
+                "scrutinizer/ocular": "^1.1",
+                "squizlabs/php_codesniffer": "^2.3",
+                "vlucas/phpdotenv": "^2.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Yabacon\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yabacon",
+                    "email": "yabacon.valley@gmail.com",
+                    "homepage": "https://github.com/yabacon",
+                    "role": "Owner"
+                },
+                {
+                    "name": "Ibrahim Lawal",
+                    "email": "ibrahim@lawal.me",
+                    "homepage": "http://ibrahim.lawal.me",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Helps make your Paystack API calls giving a stdClass object.",
+            "homepage": "https://github.com/yabacon/paystack-php",
+            "keywords": [
+                "api",
+                "curl",
+                "customer",
+                "disable",
+                "enable",
+                "page",
+                "paystack",
+                "paystack-php",
+                "plan",
+                "subscription",
+                "transaction",
+                "verify",
+                "yabacon"
+            ],
+            "support": {
+                "issues": "https://github.com/yabacon/paystack-php/issues",
+                "source": "https://github.com/yabacon/paystack-php/tree/master"
+            },
+            "time": "2020-08-19T13:24:26+00:00"
         }
     ],
     "packages-dev": [
@@ -9924,12 +10081,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
