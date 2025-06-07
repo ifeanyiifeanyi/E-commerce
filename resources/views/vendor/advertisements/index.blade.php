@@ -295,6 +295,7 @@
         @endforeach
 
         <!-- My Advertisements Section -->
+        <!-- My Advertisements Section -->
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">My Advertisements</h6>
@@ -317,10 +318,10 @@
                 @if ($advertisements->count() > 0)
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" id="dataTable">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
                                     <th style="width: 60px;">#</th>
-                                    <th>Advertisement</th>
+                                    <th>Title</th>
                                     <th>Package</th>
                                     <th>Duration</th>
                                     <th>Status</th>
@@ -342,7 +343,6 @@
                                                 <strong
                                                     class="badge bg-success">₦{{ number_format($ad->amount_paid, 2) }}</strong>
                                             </small>
-
                                         </td>
                                         <td>
                                             <div>
@@ -351,7 +351,6 @@
                                                     class="badge bg-primary">{{ $ad->package->location_display ?? 'N/A' }}</small>
                                             </div>
                                         </td>
-
                                         <td>
                                             <div class="small">
                                                 <strong>{{ $ad->start_date->format('M d') }}</strong> -
@@ -368,7 +367,6 @@
                                                     Expired
                                                 </div>
                                             @endif
-
                                         </td>
                                         <td>
                                             @php
@@ -399,10 +397,20 @@
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                 @endif
-                                                <button type="button" class="btn btn-danger"
-                                                    onclick="deleteAdvertisement({{ $ad->id }})" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                                @if ($ad->payment_status === \App\Models\VendorAdvertisement::PAYMENT_STATUS_COMPLETED)
+                                                    <a href="{{ route('vendor.advertisements.cancel', $ad->id) }}"
+                                                        style="background:purple;color:white" class="btn"
+                                                        onclick="return cancelAdvertisement({{ $ad->id }}, event)">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                @endif
+                                                @if ($ad->canBeDeleted())
+                                                    <button type="button" class="btn btn-danger"
+                                                        onclick="deleteAdvertisement({{ $ad->id }})"
+                                                        title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -777,9 +785,10 @@
                                                                     {{ $package->available_slots }}/{{ $package->max_slots }}
                                                                 </div>
                                                             </div>
-                                                           <div class="small text-muted">
-                                                            {{ round(($package->available_slots / $package->max_slots) * 100) }}% available
-                                                        </div>
+                                                            <div class="small text-muted">
+                                                                {{ round(($package->available_slots / $package->max_slots) * 100) }}%
+                                                                available
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1106,9 +1115,8 @@
     </style>
 @endsection
 
-
-
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize all modals
@@ -1116,92 +1124,91 @@
             modalElements.forEach(function(modalElement) {
                 new bootstrap.Modal(modalElement);
             });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Package selection functionality
-            let selectedPackageId = null;
-            const proceedBtn = document.getElementById('proceedBtn');
 
-            // Package selector click handlers
-            document.querySelectorAll('.package-selector:not(.package-unavailable)').forEach(card => {
-                card.addEventListener('click', function() {
-                    // Remove selection from all cards
-                    document.querySelectorAll('.package-selector').forEach(c => {
-                        c.classList.remove('selected');
-                        const btn = c.querySelector('.select-package-btn');
-                        if (btn) {
-                            btn.innerHTML =
-                                '<i class="fas fa-mouse-pointer me-2"></i>Select Package';
-                            btn.classList.remove('btn-primary');
-                            btn.classList.add('btn-outline-primary');
-                        }
-                    });
-
-                    // Add selection to clicked card
-                    this.classList.add('selected');
-                    const selectedBtn = this.querySelector('.select-package-btn');
-                    if (selectedBtn) {
-                        selectedBtn.innerHTML = '<i class="fas fa-check me-2"></i>Selected';
-                        selectedBtn.classList.remove('btn-outline-primary');
-                        selectedBtn.classList.add('btn-primary');
-                    }
-
-                    // Update selected package ID
-                    selectedPackageId = this.dataset.packageId;
-
-                    // Enable proceed button
-                    proceedBtn.disabled = false;
-                    proceedBtn.classList.remove('btn-secondary');
-                    proceedBtn.classList.add('btn-primary');
+            // Display success/error messages from session
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '{{ session('success') }}',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#4e73df'
                 });
-            });
+            @endif
 
-            // Global function for proceed button
-            window.proceedToCreate = function() {
-                if (!selectedPackageId) {
-                    // Show toast notification
-                    showNotification('Please select a package first', 'warning');
-                    return;
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#4e73df'
+                });
+            @endif
+        });
+
+        // Package selection functionality
+        let selectedPackageId = null;
+        const proceedBtn = document.getElementById('proceedBtn');
+
+        // Package selector click handlers
+        document.querySelectorAll('.package-selector:not(.package-unavailable)').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                document.querySelectorAll('.package-selector').forEach(c => {
+                    c.classList.remove('selected');
+                    const btn = c.querySelector('.select-package-btn');
+                    if (btn) {
+                        btn.innerHTML = '<i class="fas fa-mouse-pointer me-2"></i>Select Package';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline-primary');
+                    }
+                });
+
+                // Add selection to clicked card
+                this.classList.add('selected');
+                const selectedBtn = this.querySelector('.select-package-btn');
+                if (selectedBtn) {
+                    selectedBtn.innerHTML = '<i class="fas fa-check me-2"></i>Selected';
+                    selectedBtn.classList.remove('btn-outline-primary');
+                    selectedBtn.classList.add('btn-primary');
                 }
 
-                // Add loading state
-                proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
-                proceedBtn.disabled = true;
+                // Update selected package ID
+                selectedPackageId = this.dataset.packageId;
 
-                // Redirect to subscription form
-                window.location.href = '{{ route('vendor.advertisements.subscribe', '') }}/' +
-                    selectedPackageId;
-            };
-
-            // Notification function
-            function showNotification(message, type = 'info') {
-                // Create toast notification
-                const toast = document.createElement('div');
-                toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-                toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-                toast.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-
-                document.body.appendChild(toast);
-
-                // Auto dismiss after 3 seconds
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
-                }, 3000);
-            }
+                // Enable proceed button
+                proceedBtn.disabled = false;
+                proceedBtn.classList.remove('btn-secondary');
+                proceedBtn.classList.add('btn-primary');
+            });
         });
-    </script>
-    <script>
+
+        // Global function for proceed button
+        window.proceedToCreate = function() {
+            if (!selectedPackageId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Please select a package first',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#4e73df'
+                });
+                return;
+            }
+
+            // Add loading state
+            proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+            proceedBtn.disabled = true;
+
+            // Redirect to subscription form
+            window.location.href = '{{ route('vendor.advertisements.subscribe', '') }}/' + selectedPackageId;
+        };
+
         // Filter functionality
         document.getElementById('statusFilter').addEventListener('change', function() {
             const filter = this.value;
-            const rows = document.querySelectorAll('#advertisementsTable tbody tr');
+            const rows = document.querySelectorAll('#dataTable tbody tr');
 
             rows.forEach(row => {
                 if (filter === '' || row.dataset.status === filter) {
@@ -1212,9 +1219,7 @@
             });
         });
 
-        // Package selection
-        let selectedPackageId = null;
-
+        // Subscribe to package
         function subscribeToPackage(packageId) {
             selectedPackageId = packageId;
             // Close any open modals
@@ -1225,56 +1230,83 @@
             });
             // Redirect to subscription form with package pre-selected
             window.location.href = '{{ route('vendor.advertisements.subscribe', '') }}/' + packageId;
-
-        }
-
-        // Package selector in modal
-        document.querySelectorAll('.package-selector').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.package-selector').forEach(c => c.classList.remove(
-                    'border-primary'));
-                this.classList.add('border-primary');
-                selectedPackageId = this.dataset.packageId;
-            });
-        });
-
-        function proceedToCreate() {
-            if (!selectedPackageId) {
-                alert('Please select a package first');
-                return;
-            }
-            window.location.href = '{{ route('vendor.advertisements.subscribe', '') }}/' + selectedPackageId;
-
         }
 
         // Extend advertisement
         function extendAdvertisement(adId) {
-            if (confirm('Do you want to extend this advertisement campaign?')) {
-                window.location.href = '{{ url('vendor/advertisements') }}/' + adId + '/extend';
+            Swal.fire({
+                title: 'Extend Campaign',
+                text: 'Do you want to extend this advertisement campaign?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Extend',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ url('vendor/advertisements') }}/' + adId + '/extend';
+                }
+            });
+        }
 
-            }
+        // Cancel advertisement
+        function cancelAdvertisement(adId, event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Cancel Advertisement',
+                text: 'Are you sure you want to cancel this advertisement? This action may be eligible for a refund if within 24 hours.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Cancel',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = event.currentTarget.getAttribute('href');
+                }
+            });
+            return false;
         }
 
         // Delete advertisement
         function deleteAdvertisement(adId) {
-            if (confirm('Are you sure you want to delete this advertisement?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                // form.action = `{{ url('vendor/advertisements') }}/${adId}`;
-                form.action = '{{ url('vendor/advertisements') }}/' + adId;
-
-                form.innerHTML = `
-            @csrf
-            @method('DELETE')
-        `;
-                document.body.appendChild(form);
-                form.submit();
-            }
+            Swal.fire({
+                title: 'Delete Advertisement',
+                text: 'Are you sure you want to delete this advertisement? This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#4e73df',
+                confirmButtonText: 'Yes, Delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ route('vendor.advertisements.destroy', ':id') }}'.replace(':id', adId);
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         }
-
         // Refresh table
         function refreshTable() {
-            location.reload();
+            Swal.fire({
+                title: 'Refreshing',
+                text: 'Reloading advertisement data...',
+                icon: 'info',
+                showConfirmButton: false,
+                timer: 1500,
+                willClose: () => {
+                    location.reload();
+                }
+            });
         }
 
         // Auto-refresh every 5 minutes for stats
@@ -1292,6 +1324,4 @@
                 .catch(error => console.log('Auto-refresh skipped'));
         }, 300000);
     </script>
-
-
 @endsection

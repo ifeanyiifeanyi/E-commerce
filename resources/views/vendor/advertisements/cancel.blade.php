@@ -17,12 +17,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>Title:</strong> {{ $advertisement->title }}</p>
-                                <p><strong>Package:</strong> {{ $advertisement->package->name }}</p>
+                                <p><strong>Package:</strong> {{ $advertisement->package?->name }}</p>
                                 <p><strong>Amount Paid:</strong> ₦{{ number_format($advertisement->amount_paid, 2) }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Status:</strong>
-                                    <span class="badge badge-{{ $advertisement->status === 'active' ? 'success' : 'warning' }}">
+                                    <span class="badge bg-{{ $advertisement->status === 'active' ? 'success' : 'warning' }}">
                                         {{ ucfirst($advertisement->status) }}
                                     </span>
                                 </p>
@@ -56,25 +56,28 @@
                         <!-- Cancellation Form -->
                         <form id="cancellationForm" method="POST" action="{{ route('vendor.advertisements.cancel', $advertisement) }}">
                             @csrf
-                            <div class="form-group">
-                                <label for="reason">Reason for Cancellation *</label>
-                                <textarea class="form-control" id="reason" name="reason" rows="4" required
-                                    placeholder="Please provide a reason for cancelling this advertisement..."></textarea>
+                            <div class="form-group mb-3 mt-3">
+                                <label for="reason" class="form-label">Reason for Cancellation <b class="text-danger">*</b></label>
+                                <textarea class="form-control @error('reason') border-danger @enderror" id="reason" name="reason" rows="4" required
+                                    placeholder="Please provide a reason for cancelling this advertisement...">{{ old('reason') }}</textarea>
+                                    @error('reason')
+                                       <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                             </div>
 
-                            <div class="form-group">
-                                <label for="email_confirmation">Confirm Your Email Address *</label>
+                            <div class="form-group mb-3">
+                                <label for="email_confirmation" class="form-label">Confirm Your Email Address <b class="text-danger">*</b></label>
                                 <input type="email" class="form-control" id="email_confirmation"
                                     placeholder="Enter your email address to confirm cancellation" required>
-                                <small class="form-text text-muted">
-                                    Your registered email: {{ auth()->user()->email }}
+                                <small class="form-text text-primary">
+                                    Use your registered email
                                 </small>
                             </div>
 
-                            <div class="form-group">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="confirm_cancellation" required>
-                                    <label class="custom-control-label" for="confirm_cancellation">
+                            <div class="form-group mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="confirm_cancellation" required>
+                                    <label class="form-check-label" for="confirm_cancellation">
                                         I understand that this action cannot be undone and confirm that I want to cancel this advertisement.
                                     </label>
                                 </div>
@@ -104,40 +107,11 @@
         </div>
     </div>
 </div>
-
-<!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Confirm Cancellation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Warning:</strong> This action cannot be undone.
-                </div>
-                <p>Are you sure you want to cancel this advertisement?</p>
-                <p><strong>Reason:</strong> <span id="modalReason"></span></p>
-                @if($canCancel && $refundAmount > 0)
-                    <p><strong>Refund Amount:</strong> ₦{{ number_format($refundAmount, 2) }}</p>
-                @endif
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmCancelBtn">
-                    <i class="fas fa-times"></i> Confirm Cancellation
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
 @section('css')
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.1/sweetalert2.min.css">
 <style>
     .card {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -153,10 +127,11 @@
 @endsection
 
 @section('js')
+<!-- SweetAlert2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const cancelBtn = document.getElementById('cancelBtn');
-    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
     const cancellationForm = document.getElementById('cancellationForm');
     const emailConfirmation = document.getElementById('email_confirmation');
     const reasonTextarea = document.getElementById('reason');
@@ -172,45 +147,116 @@ document.addEventListener('DOMContentLoaded', function() {
             const emailValue = emailConfirmation.value.trim();
 
             if (!reason) {
-                alert('Please provide a reason for cancellation.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Information',
+                    text: 'Please provide a reason for cancellation.',
+                    confirmButtonColor: '#dc3545'
+                });
                 reasonTextarea.focus();
                 return;
             }
 
             if (!emailValue) {
-                alert('Please enter your email address.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Email Required',
+                    text: 'Please enter your email address.',
+                    confirmButtonColor: '#dc3545'
+                });
                 emailConfirmation.focus();
                 return;
             }
 
             if (emailValue !== userEmail) {
-                alert('Email address does not match your registered email.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Email Mismatch',
+                    text: 'Email address does not match your registered email.',
+                    confirmButtonColor: '#dc3545'
+                });
                 emailConfirmation.focus();
                 return;
             }
 
             if (!confirmCheckbox.checked) {
-                alert('Please confirm that you understand this action cannot be undone.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Confirmation Required',
+                    text: 'Please confirm that you understand this action cannot be undone.',
+                    confirmButtonColor: '#dc3545'
+                });
                 confirmCheckbox.focus();
                 return;
             }
 
-            // Show confirmation modal
-            document.getElementById('modalReason').textContent = reason;
-            $('#confirmationModal').modal('show');
+            // Show confirmation dialog with SweetAlert
+            Swal.fire({
+                title: 'Confirm Cancellation',
+                html: `
+                    <div class="text-left">
+                        <div class="alert alert-warning mb-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Warning:</strong> This action cannot be undone.
+                        </div>
+                        <p><strong>Reason:</strong> ${reason}</p>
+                        @if($canCancel && $refundAmount > 0)
+                            <p><strong>Refund Amount:</strong> ₦{{ number_format($refundAmount, 2) }}</p>
+                        @endif
+                        <p>Are you sure you want to cancel this advertisement?</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-times"></i> Yes, Cancel Advertisement',
+                cancelButtonText: 'No, Keep Advertisement',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return new Promise((resolve) => {
+                        // Submit the form
+                        cancellationForm.submit();
+                        resolve();
+                    });
+                }
+            });
         });
     }
 
-    if (confirmCancelBtn) {
-        confirmCancelBtn.addEventListener('click', function() {
-            // Show loading state
-            confirmCancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            confirmCancelBtn.disabled = true;
-
-            // Submit form
-            cancellationForm.submit();
+    // Show success/error messages if they exist in session
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#28a745'
         });
-    }
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#dc3545'
+        });
+    @endif
+
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error!',
+            html: `
+                <ul class="text-left">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            `,
+            confirmButtonColor: '#dc3545'
+        });
+    @endif
 });
 </script>
 @endsection

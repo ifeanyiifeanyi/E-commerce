@@ -482,11 +482,7 @@
 @endsection
 
 @section('css')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"
-        type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet"
-        type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" rel="stylesheet" type="text/css" />
+
 
     <style>
         /* Make Select2 match Bootstrap form-control styling */
@@ -566,16 +562,14 @@
 
 
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+
     <script>
         $(document).ready(function() {
             // Initialize Select2 with Bootstrap theme
             $('.select2').select2({
                 theme: 'default',
                 width: '100%',
+
                 placeholder: function() {
                     return $(this).data('placeholder') || 'Select an option';
                 }
@@ -584,45 +578,7 @@
             // Convert tag inputs to Select2 multiple
             initializeTagsAsSelect2();
 
-            // Initialize Quill editor
-            var quill = new Quill('#long_description_editor', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [
-                        [{
-                            'header': [1, 2, 3, 4, 5, 6, false]
-                        }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{
-                            'list': 'ordered'
-                        }, {
-                            'list': 'bullet'
-                        }],
-                        [{
-                            'script': 'sub'
-                        }, {
-                            'script': 'super'
-                        }],
-                        [{
-                            'indent': '-1'
-                        }, {
-                            'indent': '+1'
-                        }],
-                        [{
-                            'color': []
-                        }, {
-                            'background': []
-                        }],
-                        ['link', 'image'],
-                        ['clean']
-                    ]
-                },
-            });
-
-            // Update hidden input with Quill content on form submit
-            $('#productForm').on('submit', function() {
-                $('#long_description_input').val(quill.root.innerHTML);
-            });
+          
 
             // Load subcategories when a category is selected
             $('#category_id').on('change', function() {

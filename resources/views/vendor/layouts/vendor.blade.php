@@ -10,6 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+
     <!-- Favicon -->
     <link rel="shortcut icon" href="">
 
@@ -29,10 +30,13 @@
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"
-        type="text/css" />
 
     <link rel="stylesheet" href="{{ asset('vendorsrc/assets/css/main.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" rel="stylesheet"
+        type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" rel="stylesheet" type="text/css" />
     @yield('css')
 </head>
 
@@ -57,7 +61,7 @@
 
 
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 JS Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
@@ -75,9 +79,56 @@
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+              // Initialize Quill editor
+            var quill = new Quill('#long_description_editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{
+                            'header': [1, 2, 3, 4, 5, 6, false]
+                        }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{
+                            'list': 'ordered'
+                        }, {
+                            'list': 'bullet'
+                        }],
+                        [{
+                            'script': 'sub'
+                        }, {
+                            'script': 'super'
+                        }],
+                        [{
+                            'indent': '-1'
+                        }, {
+                            'indent': '+1'
+                        }],
+                        [{
+                            'color': []
+                        }, {
+                            'background': []
+                        }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                },
+            });
+
+            // Update hidden input with Quill content on form submit
+            $('#productForm').on('submit', function() {
+                $('#long_description_input').val(quill.root.innerHTML);
+            });
+
+
+
             // Initialize DataTables
             $('#datatables').DataTable({
                 responsive: true,

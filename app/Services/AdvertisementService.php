@@ -11,14 +11,13 @@ use Illuminate\Support\Facades\Log;
 use App\Models\AdvertisementPackage;
 use App\Models\AdvertisementPayment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Imagick\Driver;
 
-
 class AdvertisementService
 {
-
     protected $paystack;
 
     public function __construct()
@@ -36,6 +35,7 @@ class AdvertisementService
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
     /**
      * Create a new advertisement
      */
@@ -51,7 +51,6 @@ class AdvertisementService
                 throw new \Exception('Advertisement package is not available or fully booked.');
             }
 
-            // Handle image upload
             // Handle image upload
             if ($image) {
                 $location = app(AdminAdvertisementPackageService::class)
@@ -72,9 +71,8 @@ class AdvertisementService
                     height: $location['dimensions']['height']
                 );
                 $image->save(public_path('storage/' . $path));
-                $data['image_path'] =  $path;
+                $data['image_path'] = $path;
             }
-
 
             // Calculate dates
             $startDate = now();
@@ -109,6 +107,7 @@ class AdvertisementService
                 'message' => $e->getMessage(),
                 'data' => $data
             ]);
+            throw $e;
         }
     }
 
@@ -120,9 +119,6 @@ class AdvertisementService
         return 'ADV' . time() . rand(1000, 9999);
     }
 
-    /**
-     * Process advertisement payment
-     */
     /**
      * Process advertisement payment
      */
@@ -177,8 +173,6 @@ class AdvertisementService
             throw new Exception('Failed to initiate payment: ' . $e->getMessage());
         }
     }
-
-
 
     public function verifyPayment(string $reference): AdvertisementPayment
     {
@@ -236,7 +230,7 @@ class AdvertisementService
     public function canCancelAdvertisement(VendorAdvertisement $advertisement): bool
     {
         // Check if advertisement is in cancellable status
-        if (!in_array($advertisement->status, ['pending_approval', 'active'])) {
+        if (!in_array($advertisement->status, ['pending', 'active'])) {
             return false;
         }
 
@@ -254,7 +248,6 @@ class AdvertisementService
     /**
      * Calculate refund amount for cancellation
      */
-
     public function calculateRefundAmount(VendorAdvertisement $advertisement)
     {
         $refundAmount = 0;
@@ -275,6 +268,92 @@ class AdvertisementService
         }
 
         return round($refundAmount, 2);
+    }
+
+    /**
+     * Process Paystack refund with proper error handling and timeouts
+     */
+    private function processPaystackRefund(string $transactionReference, float $refundAmount): array
+    {
+        try {
+            // Set longer timeout for refund requests
+            $originalTimeout = ini_get('default_socket_timeout');
+            ini_set('default_socket_timeout', 60); // 60 seconds timeout
+
+            $refundData = [
+                'transaction' => $transactionReference,
+                'amount' => (int) round($refundAmount * 100), // Convert to kobo and ensure integer
+            ];
+
+            Log::info('Initiating Paystack refund', [
+                'transaction_reference' => $transactionReference,
+                'refund_amount' => $refundAmount,
+                'refund_data' => $refundData
+            ]);
+
+            // Make direct HTTP request to Paystack refund API
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . (config('services.paystack.secret_key') ?? env('PAYSTACK_SECRET_KEY')),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.paystack.co/refund', $refundData);
+
+            // Restore original timeout
+            ini_set('default_socket_timeout', $originalTimeout);
+
+            $refundResult = $response->json();
+
+            if ($response->successful() && isset($refundResult['status']) && $refundResult['status'] === true) {
+                Log::info('Paystack refund successful', [
+                    'transaction_reference' => $transactionReference,
+                    'refund_data' => $refundResult['data']
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $refundResult['data'],
+                    'message' => 'Refund processed successfully'
+                ];
+            } else {
+                Log::warning('Paystack refund failed', [
+                    'transaction_reference' => $transactionReference,
+                    'message' => $refundResult['message'] ?? 'Unknown error',
+                    'response' => $refundResult
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => $refundResult['message'] ?? 'Refund failed'
+                ];
+            }
+        } catch (\Exception $e) {
+            // Restore original timeout in case of exception
+            if (isset($originalTimeout)) {
+                ini_set('default_socket_timeout', $originalTimeout);
+            }
+
+            Log::error('Paystack refund exception', [
+                'transaction_reference' => $transactionReference,
+                'error_message' => $e->getMessage(),
+                'error_code' => $e->getCode()
+            ]);
+
+            // Check for specific timeout or network errors
+            if (
+                strpos($e->getMessage(), 'timeout') !== false ||
+                strpos($e->getMessage(), 'cURL error 28') !== false
+            ) {
+                return [
+                    'success' => false,
+                    'message' => 'Network timeout occurred. Refund may still be processed. Please contact support if needed.',
+                    'timeout' => true
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Refund processing failed: ' . $e->getMessage()
+            ];
+        }
     }
 
     /**
@@ -300,56 +379,43 @@ class AdvertisementService
                     ->first();
 
                 if ($payment) {
-                    try {
-                        $refundData = [
-                            'transaction' => $payment->payment_reference,
-                            'amount' => round($refundAmount * 100), // Convert to kobo and round
-                        ];
+                    $refundResult = $this->processPaystackRefund($payment->payment_reference, $refundAmount);
 
-                        $refund = $this->paystack->refund->create($refundData);
-
-                        if ($refund->status) {
-                            // Create refund payment record
-                            AdvertisementPayment::create([
-                                'advertisement_id' => $advertisement->id,
-                                'vendor_id' => $advertisement->vendor_id,
-                                'payment_reference' => 'CANCEL_REFUND_' . $payment->payment_reference,
-                                'amount' => -$refundAmount,
-                                'payment_method' => AdvertisementPayment::WALLET_PAYMENT,
-                                'payment_status' => AdvertisementPayment::PAYMENT_REFUNDED,
-                                'refund_reason' => $reason,
-                                'refunded_at' => now(),
-                                'payment_date' => now(),
-                                'notes' => 'Cancellation refund: ' . $reason,
-                                'payment_data' => json_encode($refund->data)
-                            ]);
-                        } else {
-                            Log::warning('Refund initiation failed', [
-                                'message' => $refund->message ?? 'Unknown error',
-                                'payment_reference' => $payment->payment_reference,
-                                'refund_amount' => $refundAmount
-                            ]);
-                            // Continue with cancellation even if refund fails
-                        }
-                    } catch (Exception $refundException) {
-                        Log::error('Refund API error', [
-                            'message' => $refundException->getMessage(),
+                    if ($refundResult['success']) {
+                        // Create refund payment record
+                        AdvertisementPayment::create([
+                            'advertisement_id' => $advertisement->id,
+                            'vendor_id' => $advertisement->vendor_id,
+                            'payment_reference' => 'CANCEL_REFUND_' . $payment->payment_reference,
+                            'amount' => -$refundAmount,
+                            'payment_method' => AdvertisementPayment::WALLET_PAYMENT,
+                            'payment_status' => AdvertisementPayment::PAYMENT_REFUNDED,
+                            'refund_reason' => $reason,
+                            'refunded_at' => now(),
+                            'payment_date' => now(),
+                            'notes' => 'Cancellation refund: ' . $reason,
+                            'payment_data' => json_encode($refundResult['data'])
+                        ]);
+                    } else {
+                        Log::warning('Refund initiation failed', [
+                            'message' => $refundResult['message'] ?? 'Unknown error',
                             'payment_reference' => $payment->payment_reference,
                             'refund_amount' => $refundAmount
                         ]);
                         // Continue with cancellation even if refund fails
                     }
+                    // Update advertisement status
+                    $advertisement->update([
+                        'status' => VendorAdvertisement::STATUS_PAUSED,
+                        'cancellation_reason' => $reason,
+                        'cancelled_at' => now(),
+                        'cancelled_by' => Auth::id(),
+                        'payment_status' => VendorAdvertisement::PAYMENT_STATUS_REFUNDED
+                    ]);
                 }
             }
 
-            // Update advertisement status
-            $advertisement->update([
-                'status' => 'cancelled',
-                'cancellation_reason' => $reason,
-                'cancelled_at' => now(),
-                'cancelled_by' => Auth::id(),
-                'payment_status' => VendorAdvertisement::PAYMENT_STATUS_REFUNDED
-            ]);
+
 
             DB::commit();
 
@@ -378,8 +444,7 @@ class AdvertisementService
 
 
 
-
-
+    
 
     public function renewAdvertisement(VendorAdvertisement $advertisement)
     {
@@ -398,7 +463,6 @@ class AdvertisementService
                 'end_date' => $newEndDate,
                 'status' => AdvertisementPayment::PAYMENT_PENDING,
                 'payment_status' => AdvertisementPayment::PAYMENT_PENDING,
-
             ]);
             $paymentData = $this->initiatePayment($advertisement);
             DB::commit();
@@ -413,30 +477,6 @@ class AdvertisementService
             throw new Exception('Failed to renew advertisement');
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Approve advertisement
@@ -505,7 +545,6 @@ class AdvertisementService
     {
         $advertisement->recordClick();
     }
-
 
     /**
      * Extend advertisement duration

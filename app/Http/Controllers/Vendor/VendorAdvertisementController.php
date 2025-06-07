@@ -208,35 +208,6 @@ class VendorAdvertisementController extends Controller
 
 
     /**
-     * Cancel advertisement by vendor
-     */
-    // public function cancel(VendorAdvertisement $advertisement, Request $request)
-    // {
-    //     try {
-    //         // Ensure vendor owns this advertisement
-    //         if ($advertisement->vendor_id !== Auth::id()) {
-    //             return redirect()->route('vendor.advertisement')
-    //                 ->with('error', 'Unauthorized action.');
-    //         }
-
-    //         $reason = $request->input('reason', 'Cancelled by vendor');
-
-    //         $this->advertisementService->cancelAdvertisement($advertisement, $reason);
-
-    //         return redirect()->route('vendor.advertisement')
-    //             ->with('success', 'Advertisement cancelled successfully. Refund will be processed within 5-7 business days.');
-    //     } catch (Exception $e) {
-    //         Log::error('Failed to cancel advertisement', [
-    //             'message' => $e->getMessage(),
-    //             'advertisement_id' => $advertisement->id,
-    //             'vendor_id' => Auth::id(),
-    //         ]);
-
-    //         return redirect()->back()
-    //             ->with('error', 'Failed to cancel advertisement: ' . $e->getMessage());
-    //     }
-    // }
-    /**
      * Cancel advertisement by vendor (Updated)
      */
     public function cancel(VendorAdvertisement $advertisement, Request $request)
@@ -273,6 +244,48 @@ class VendorAdvertisementController extends Controller
 
             return redirect()->back()
                 ->with('error', 'Failed to cancel advertisement: ' . $e->getMessage());
+        }
+    }
+
+
+
+    /**
+     * Delete an advertisement
+     */
+    public function destroy($advert, Request $request)
+    {
+
+        $advertisement = VendorAdvertisement::findOrFail($advert);
+        try {
+            // Ensure vendor owns this advertisement
+            if ($advertisement->vendor_id !== Auth::id()) {
+                return redirect()->route('vendor.advertisement')
+                    ->with('error', 'Unauthorized action.');
+            }
+
+            // Check if advertisement can be deleted
+            if (!$advertisement->canBeDeleted()) {
+                return redirect()->route('vendor.advertisement')
+                    ->with('error', 'This advertisement cannot be deleted. Only paused, rejected, or expired ads can be removed.');
+            }
+
+            // Delete associated payments
+            $advertisement->deleteAssociatedPayments();
+
+            // Delete the advertisement
+            $advertisement->delete();
+
+            return redirect()->route('vendor.advertisement')
+                ->with('success', 'Advertisement deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Failed to delete advertisement', [
+                'message' => $e->getMessage(),
+                'advertisement_id' => $advertisement->id,
+                'vendor_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Failed to delete advertisement: ' . $e->getMessage());
         }
     }
 }

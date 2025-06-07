@@ -27,8 +27,10 @@ class VendorAdvertisement extends Model
         'admin_notes',
         'rejection_reason',
         'ctr',
-        'payment_status'
-
+        'payment_status',
+        'cancelled_at',
+        'cancellation_reason',
+        'cancelled_by',
     ];
 
     protected $casts = [
@@ -45,7 +47,7 @@ class VendorAdvertisement extends Model
     const STATUS_PAUSED = 'paused';
     const STATUS_EXPIRED = 'expired';
     const STATUS_REJECTED = 'rejected';
-    
+
     const PAYMENT_STATUS_PENDING = 'pending';
     const PAYMENT_STATUS_COMPLETED = 'completed';
     const PAYMENT_STATUS_FAILED = 'failed';
@@ -190,5 +192,36 @@ class VendorAdvertisement extends Model
             'paused' => '<span class="badge badge-info">Paused</span>',
             default => '<span class="badge badge-light">' . ucfirst($this->status) . '</span>'
         };
+    }
+
+    /**
+     * Check if the advertisement can be deleted
+     */
+    public function canBeDeleted(): bool
+    {
+        // Cannot delete if status is active and not expired
+        if ($this->status === self::STATUS_ACTIVE && !$this->isExpired()) {
+            return false;
+        }
+
+        // Cannot delete if status is pending (awaiting approval)
+        if ($this->status === self::STATUS_PENDING) {
+            return false;
+        }
+
+        // Can delete if status is paused, rejected, or expired
+        return in_array($this->status, [
+            self::STATUS_PAUSED,
+            self::STATUS_REJECTED,
+            self::STATUS_EXPIRED
+        ]);
+    }
+
+    /**
+     * Delete associated payments
+     */
+    public function deleteAssociatedPayments(): void
+    {
+        $this->payments()->delete();
     }
 }
