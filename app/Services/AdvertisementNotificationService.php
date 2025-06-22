@@ -51,7 +51,8 @@ class AdvertisementNotificationService
     /**
      * Create notification record
      */
-    public function createNotification(VendorAdvertisement $advertisement, string $type, string $message): AdvertisementNotification
+
+     public function createNotification(VendorAdvertisement $advertisement, string $type, string $message): AdvertisementNotification
     {
         return AdvertisementNotification::create([
             'advertisement_id' => $advertisement->id,

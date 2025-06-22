@@ -15,6 +15,12 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'email' => env('APP_EMAIL', ''),
+    'phone' => env('APP_PHONE', ''),
+    'address' => env('APP_ADDRESS', ''),
+    'currency' => env('APP_CURRENCY', 'NGN'),
+    'currency_symbol' => env('APP_CURRENCY_SYMBOL', '₦'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

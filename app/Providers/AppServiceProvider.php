@@ -2,13 +2,14 @@
 
 namespace App\Providers;
 
-use App\Channels\TwilioChannel;
 
 use App\Services\CurrencyService;
+use App\Models\CustomerLoginHistory;
 use Illuminate\Pagination\Paginator;
-use App\Channels\AfricasTalkingChannel;
+
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Notification;
+use App\Observers\CustomerLoginHistoryObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,9 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
-        Notification::extend('twilio', function ($app) {
-            return new TwilioChannel();
-        });
 
+        CustomerLoginHistory::observe(CustomerLoginHistoryObserver::class);
     }
 }

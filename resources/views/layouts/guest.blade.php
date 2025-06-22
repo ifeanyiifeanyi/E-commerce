@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +30,8 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        .search-form input, .search-form button {
+        .search-form input,
+        .search-form button {
             height: 42px;
         }
 
@@ -126,7 +128,7 @@
             margin: 2rem auto;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             padding: 2rem;
         }
 
@@ -251,6 +253,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
@@ -258,12 +261,14 @@
             <div class="row w-100">
                 <div class="col-lg-8 col-md-12">
                     <form class="d-flex search-form w-100">
-                        <input class="form-control me-2" type="search" placeholder="Search products, categories etc..." aria-label="Search">
+                        <input class="form-control me-2" type="search" placeholder="Search products, categories etc..."
+                            aria-label="Search">
                         <button class="btn" type="submit">Search</button>
                     </form>
                 </div>
                 <div class="col-lg-4 col-md-12">
-                    <div class="d-flex ms-auto justify-content-lg-end justify-content-center header-actions mt-lg-0 mt-3">
+                    <div
+                        class="d-flex ms-auto justify-content-lg-end justify-content-center header-actions mt-lg-0 mt-3">
                         <a href="#" class="nav-link dropdown-toggle">
                             <i class="fa fa-question-circle me-1"></i> Help
                         </a>
@@ -279,7 +284,8 @@
     <!-- Main Navigation -->
     <nav class="navbar navbar-expand-lg main-nav">
         <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
@@ -288,7 +294,8 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             Shop
                         </a>
                         <ul class="dropdown-menu">
@@ -300,7 +307,8 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             Pages
                         </a>
                         <ul class="dropdown-menu">
@@ -352,5 +360,93 @@
             });
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to get user's location
+            function getUserLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            // Store coordinates in hidden inputs
+                            addHiddenInput('latitude', position.coords.latitude);
+                            addHiddenInput('longitude', position.coords.longitude);
+                        },
+                        function(error) {
+                            console.log('Geolocation error:', error.message);
+                            // Don't prevent login if geolocation fails
+                        }, {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 300000 // 5 minutes
+                        }
+                    );
+                }
+            }
+
+            // Function to add hidden input to the form
+            function addHiddenInput(name, value) {
+                const form = document.querySelector('form');
+                if (form) {
+                    // Remove existing input if it exists
+                    const existing = form.querySelector(`input[name="${name}"]`);
+                    if (existing) {
+                        existing.remove();
+                    }
+
+                    // Create new hidden input
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = name;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+            }
+
+            // Function to detect registration source
+            function detectRegistrationSource() {
+                let source = 'web'; // default
+
+                // Check if it's a mobile device
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    source = 'mobile_web';
+                }
+
+                // Check if it's from a social media referrer
+                const referrer = document.referrer.toLowerCase();
+                if (referrer.includes('facebook.com')) {
+                    source = 'facebook';
+                } else if (referrer.includes('twitter.com') || referrer.includes('t.co')) {
+                    source = 'twitter';
+                } else if (referrer.includes('linkedin.com')) {
+                    source = 'linkedin';
+                } else if (referrer.includes('instagram.com')) {
+                    source = 'instagram';
+                } else if (referrer.includes('google.com')) {
+                    source = 'google_search';
+                }
+
+                addHiddenInput('registration_source', source);
+            }
+
+            // Get user location when page loads
+            getUserLocation();
+
+            // Detect registration source
+            detectRegistrationSource();
+
+            // Also try to get location when form is submitted (as a fallback)
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Small delay to allow geolocation to complete
+                    setTimeout(() => {
+                        // Form will submit normally after this
+                    }, 100);
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>

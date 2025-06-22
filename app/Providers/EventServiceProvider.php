@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Models\Product;
 use App\Models\MeasurementUnit;
+use Illuminate\Auth\Events\Login;
 use App\Observers\ProductObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use App\Listeners\UserLoggedInListener;
 use App\Observers\MeasurementUnitObserver;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,6 +23,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        Login::class => [
+            UserLoggedInListener::class,
         ],
     ];
 

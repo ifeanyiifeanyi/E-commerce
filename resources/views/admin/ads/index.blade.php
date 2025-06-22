@@ -32,7 +32,7 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>${{ number_format($totalRevenue, 0) }}</h3>
+                    <h3>₦{{ number_format($totalRevenue, 0) }}</h3>
                     <p>Total Revenue</p>
                 </div>
                 <div class="icon">
@@ -111,7 +111,7 @@
                                         </td>
                                         <td>
                                             <div>
-                                                <strong>${{ number_format($package->price, 2) }}</strong>
+                                                <strong>₦{{ number_format($package->price, 2) }}</strong>
                                                 <br><small class="text-muted">{{ $package->duration_days }} days</small>
                                             </div>
                                         </td>

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\VendorMiddleware;
 use App\Http\Middleware\CurrencyMiddleware;
+use App\Http\Middleware\CaptureLocationMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -15,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Register web middleware
+        $middleware->web(
+            [
+                CaptureLocationMiddleware::class,
+            ]
+        );
 
         $middleware->alias(
             [

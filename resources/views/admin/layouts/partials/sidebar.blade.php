@@ -32,7 +32,14 @@
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('admin.advertisement.packages') }}">ADS Packages</a></li>
-                        <li><a href="{{ route('admin.brands.create') }}">Create Brand</a></li>
+                        <li><a href="{{ route('admin.vendor.advertisements') }}">Advertisements</a></li>
+                        <li><a href="{{ route('admin.vendor.advertisements.pending') }}">Pending Advertisements</a></li>
+                        
+                        <li><a href="{{ route('admin.vendor.advertisements.active') }}">Active Advertisements</a></li>
+                        <li><a> -------------------- </a></li>
+                       
+                        <li><a href="{{ route('admin.vendor.advertisements.expired') }}">Expired Advertisements</a></li>
+                        <li><a href="{{ route('admin.vendor.advertisements.suspended_details') }}">Suspended Advertisements</a></li>
                     </ul>
                 </li>
 

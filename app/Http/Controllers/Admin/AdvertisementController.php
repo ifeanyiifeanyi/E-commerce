@@ -115,7 +115,7 @@ class AdvertisementController extends Controller
         $this->authorize('view', $package);
 
         $advertisements = $package->advertisements()
-            ->with(['vendor', 'location'])
+            ->with(['vendor'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         $statistics = $this->analyticsService->getPackageStats($package->id);

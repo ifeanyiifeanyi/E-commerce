@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CustomerEmailCampaign extends Model
 {
+    // protected $fillable = [
+    //     'user_id',
+    //     'campaign_id',
+    //     'email_type',
+    //     'subject',
+    //     'content',
+    //     'sent_at',
+    //     'opened_at',
+    //     'clicked_at',
+    //     'open_count',
+    //     'click_count',
+    // ];
     protected $fillable = [
         'user_id',
         'campaign_id',
@@ -32,10 +44,10 @@ class CustomerEmailCampaign extends Model
     }
 
     // look for out for this METHOD USAGE
-    public function campaign(): BelongsTo
-    {
-        return $this->belongsTo(CustomerEmailCampaign::class);
-    }
+    // public function campaign(): BelongsTo
+    // {
+    //     return $this->belongsTo(CustomerEmailCampaign::class);
+    // }
 
     public function markAsOpened()
     {

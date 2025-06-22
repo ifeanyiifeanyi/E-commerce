@@ -8,14 +8,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CustomerActivityLog extends Model
 {
-    protected $fillable = [
+    // protected $fillable = [
+    //     'user_id',
+    //     'activity_type',
+    //     'description',
+    //     'ip_address',
+    //     'user_agent',
+    //     'related_model_type',
+    //     'related_model_id',
+    // ];
+     protected $fillable = [
         'user_id',
         'activity_type',
         'description',
+        'properties',
         'ip_address',
         'user_agent',
-        'related_model_type',
-        'related_model_id',
+    ];
+
+    protected $casts = [
+        'properties' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -28,21 +40,33 @@ class CustomerActivityLog extends Model
         return $this->morphTo();
     }
 
-    public static function log($userId, $activityType, $description = null, $relatedModel = null, $ipAddress = null)
+    // public static function log($userId, $activityType, $description = null, $relatedModel = null, $ipAddress = null)
+    // {
+    //     $data = [
+    //         'user_id' => $userId,
+    //         'activity_type' => $activityType,
+    //         'description' => $description,
+    //         'ip_address' => $ipAddress ?? request()->ip(),
+    //         'user_agent' => request()->userAgent(),
+    //     ];
+
+    //     if ($relatedModel) {
+    //         $data['related_model_type'] = get_class($relatedModel);
+    //         $data['related_model_id'] = $relatedModel->id;
+    //     }
+
+    //     return self::create($data);
+    // }
+
+     public static function log(int $userId, string $activityType, string $description = null, array $properties = null, string $ipAddress = null, string $userAgent = null)
     {
-        $data = [
+        return static::create([
             'user_id' => $userId,
             'activity_type' => $activityType,
             'description' => $description,
+            'properties' => $properties,
             'ip_address' => $ipAddress ?? request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ];
-
-        if ($relatedModel) {
-            $data['related_model_type'] = get_class($relatedModel);
-            $data['related_model_id'] = $relatedModel->id;
-        }
-
-        return self::create($data);
+            'user_agent' => $userAgent ?? request()->userAgent(),
+        ]);
     }
 }

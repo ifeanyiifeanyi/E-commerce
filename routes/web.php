@@ -26,6 +26,7 @@ use App\Http\Controllers\Auth\VendorRegistrationController;
 use App\Http\Controllers\Admin\AdminCustomerManagerController;
 use App\Http\Controllers\Admin\ManageVendorDocumentController;
 use App\Http\Controllers\Admin\AdminVendorStoreDetailController;
+use App\Http\Controllers\Admin\ManageVendorAdvertisementSubscriptionController;
 use App\Http\Controllers\Vendor\VendorAdvertisementController;
 
 Route::get('/', function () {
@@ -139,6 +140,32 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
         Route::delete('advertisement-packages/{package}/delete', 'destroy')->name('advertisement.packages.destroy');
 
         // Route::post('/vendor/advertisements/{vendor}', 'vendorAdvertisements')->name('vendor.advertisements');
+    });
+
+    Route::controller(ManageVendorAdvertisementSubscriptionController::class)->group(function () {
+        Route::get('vendor-advertisements', 'index')->name('vendor.advertisements');
+        Route::get('vendor-advertisements/{advertisement}', 'show')->name('vendor.advertisements.show');
+        Route::post('vendor-advertisements/{advertisement}/approve', 'approve')->name('vendor.advertisements.approve');
+        Route::post('vendor-advertisements/{advertisement}/reject', 'reject')->name('vendor.advertisements.reject');
+        Route::delete('vendor-advertisements/{advertisement}', 'destroy')->name('vendor.advertisements.destroy');
+
+
+        Route::get('pending-advertisements', 'pendingAds')->name('vendor.advertisements.pending');
+        Route::get('suspended-advertisements', 'suspendedAds')->name('vendor.advertisements.suspended_details');
+        Route::get('active-advertisements', 'activeAds')->name('vendor.advertisements.active');
+        Route::get('expired-advertisements', 'expiredAds')->name('vendor.advertisements.expired');
+
+        Route::post('vendor-advertisements/{advertisement}/suspend', 'suspend')->name('vendor.advertisements.suspended');
+        Route::post('vendor-advertisements/{advertisement}/reactivate', 'reactivate')->name('vendor.advertisements.reactivate');
+
+
+
+
+        Route::post('bulk-advertisement-action', 'bulkAction')->name('vendor.advertisements.bulk-action');
+
+        Route::get('vendor-advertisements/{advertisementId}/send-message', 'sendVendorMessage')->name('vendor.advertisements.send-message');
+
+        Route::get('advertisement-analytics', 'analytics')->name('advertisement.analytics');
     });
 
     Route::controller(AdminProfileController::class)->group(function () {
@@ -383,9 +410,39 @@ Route::group(['prefix' => 'vendor', 'as' => 'vendor.', 'middleware' => ['auth', 
 });
 
 
-Route::group(['prefix' => 'customer', 'as' => 'customer.', 'middleware' => ['auth', 'role:user']], function () {
+// Route::group(['prefix' => 'customer', 'as' => 'customer.', 'middleware' => ['auth', 'role:user']], function () {
+//     Route::controller(UserController::class)->group(function () {
+//         Route::get('dashboard', 'dashboard')->name('dashboard');
+//     });
+// });
+
+Route::group(['prefix' => 'customer', 'as' => 'user.', 'middleware' => ['auth', 'role:user']], function () {
+
     Route::controller(UserController::class)->group(function () {
+        // Dashboard
         Route::get('dashboard', 'dashboard')->name('dashboard');
+
+        // Profile Management
+        Route::get('profile', 'profile')->name('profile');
+        Route::put('profile', 'updateProfile')->name('profile.update');
+        Route::put('profile/password', 'changePassword')->name('profile.password');
+
+        // Address Management
+        Route::get('addresses', 'addresses')->name('addresses');
+        Route::post('addresses', 'storeAddress')->name('addresses.store');
+        Route::put('addresses/{address}', 'updateAddress')->name('addresses.update');
+        Route::delete('addresses/{address}', 'deleteAddress')->name('addresses.delete');
+
+
+
+        // Security & Activity
+        Route::get('security', 'security')->name('security');
+        Route::get('activity', 'activityLog')->name('activity');
+
+        // Notifications
+        Route::get('notifications', 'notifications')->name('notifications');
+        Route::post('notifications/{notification}/read', 'markNotificationAsRead')->name('notifications.read');
+        Route::post('notifications/read-all', 'markAllNotificationsAsRead')->name('notifications.read-all');
     });
 });
 require __DIR__ . '/auth.php';

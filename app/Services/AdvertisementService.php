@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 use Intervention\Image\Drivers\Imagick\Driver;
+use App\Notifications\SendAdvertisementNotification;
 
 class AdvertisementService
 {
@@ -273,7 +275,7 @@ class AdvertisementService
     /**
      * Process Paystack refund with proper error handling and timeouts
      */
-    private function processPaystackRefund(string $transactionReference, float $refundAmount): array
+    public function processPaystackRefund(string $transactionReference, float $refundAmount): array
     {
         try {
             // Set longer timeout for refund requests
@@ -433,11 +435,42 @@ class AdvertisementService
         }
     }
 
+    /**
+     * Approve advertisement
+     */
+    public function approveAdvertisement(VendorAdvertisement $advertisement, string $adminNotes = ''): bool
+    {
+        $advertisement->update([
+            'status' => VendorAdvertisement::STATUS_ACTIVE,
+            'admin_notes' => $adminNotes,
+        ]);
+
+        // Send approval notification to vendor
+        Notification::send($advertisement->vendor, new SendAdvertisementNotification($advertisement, 'approved', $adminNotes));
+
+        return true;
+    }
 
 
+        /**
+     * Reject advertisement
+     */
+    public function rejectAdvertisement(VendorAdvertisement $advertisement, string $reason): bool
+    {
+        $advertisement->update([
+            'rejection_reason' => $reason,
+            'status' => VendorAdvertisement::STATUS_REJECTED,
+            'cancellation_reason' => $reason,
+            'cancelled_at' => now(),
+            'cancelled_by' => Auth::id(),
+            'payment_status' => VendorAdvertisement::PAYMENT_STATUS_REFUNDED
+        ]);
+        // Optionally, you can log the rejection reason
+        // Send rejection notification to vendor
+        Notification::send($advertisement->vendor, new SendAdvertisementNotification($advertisement, 'rejected', $reason));
 
-
-
+        return true;
+    }
 
 
 
@@ -445,6 +478,19 @@ class AdvertisementService
 
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function renewAdvertisement(VendorAdvertisement $advertisement)
     {
@@ -478,37 +524,9 @@ class AdvertisementService
         }
     }
 
-    /**
-     * Approve advertisement
-     */
-    public function approveAdvertisement(VendorAdvertisement $advertisement, string $adminNotes = ''): bool
-    {
-        $advertisement->update([
-            'status' => 'active',
-            'admin_notes' => $adminNotes,
-        ]);
 
-        // Send approval notification to vendor
-        // SendAdvertisementNotification::dispatch($advertisement, 'approved');
 
-        return true;
-    }
 
-    /**
-     * Reject advertisement
-     */
-    public function rejectAdvertisement(VendorAdvertisement $advertisement, string $reason): bool
-    {
-        $advertisement->update([
-            'status' => 'rejected',
-            'rejection_reason' => $reason,
-        ]);
-
-        // Send rejection notification to vendor
-        // SendAdvertisementNotification::dispatch($advertisement, 'rejected', $reason);
-
-        return true;
-    }
 
     /**
      * Get active advertisements for a specific location
