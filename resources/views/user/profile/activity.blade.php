@@ -6,10 +6,89 @@
 
 @section('customer')
     <div class="row">
-        <div class="col-12">
+        <!-- Activity Statistics Card -->
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Activity Summary</h6>
+                    </div>
+                    <div class="card-body p-2 p-md-3">
+                        @php
+                            $stats = App\Models\CustomerActivityLog::getStatisticsByCategory(auth()->id());
+                        @endphp
+
+                        <div class="row text-center g-2 g-md-3">
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-user-edit fa-2x text-primary mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['profile'] }}</h4>
+                                    <small class="text-muted">Profile Updates</small>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-lock fa-2x text-success mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['security'] }}</h4>
+                                    <small class="text-muted">Security Changes</small>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-map-marker-alt fa-2x text-info mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['address'] }}</h4>
+                                    <small class="text-muted">Address Changes</small>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-shopping-cart fa-2x text-warning mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['order'] }}</h4>
+                                    <small class="text-muted">Order Activities</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Statistics Row -->
+                        <div class="row text-center g-2 g-md-3 mt-3">
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-bell fa-2x text-purple mb-2"></i>
+                                    <h4 class="mb-1"> {{ auth()->user()->customerNotifications->count() }}</h4>
+                                    <small class="text-muted">Notifications</small>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-cog fa-2x text-secondary mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['system'] }}</h4>
+                                    <small class="text-muted">System Events</small>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-tags fa-2x text-danger mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['promotion'] }}</h4>
+                                    <small class="text-muted">Promotions</small>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-item">
+                                    <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                                    <h4 class="mb-1">{{ $stats['total'] }}</h4>
+                                    <small class="text-muted">Total Activities</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="col-12 mt-3">
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    <div
+                        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                         <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Account Activity</h5>
                         <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
                             <select class="form-select form-select-sm" id="activityFilter">
@@ -37,25 +116,36 @@
                                             </div>
                                         </div>
                                         <div class="activity-content flex-grow-1 ms-2 ms-md-3">
-                                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
+                                            <div
+                                                class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
                                                 <div class="flex-grow-1 w-100">
                                                     <h6 class="activity-title mb-1">{{ $activity->description }}</h6>
                                                     <div class="activity-meta text-muted">
                                                         <i class="fas fa-clock me-1"></i>
-                                                        <span class="d-block d-sm-inline">{{ $activity->created_at->diffForHumans() }}</span>
-                                                        <span class="d-block d-sm-inline ms-sm-2">{{ $activity->created_at->format('M d, Y h:i A') }}</span>
+                                                        <span
+                                                            class="d-block d-sm-inline">{{ $activity->created_at->diffForHumans() }}</span>
+                                                        <span
+                                                            class="d-block d-sm-inline ms-sm-2">{{ $activity->created_at->format('M d, Y h:i A') }}</span>
                                                     </div>
                                                     @if ($activity->properties && count($activity->properties) > 0)
                                                         <div class="activity-details mt-2">
                                                             @foreach ($activity->properties as $key => $value)
                                                                 @if (!in_array($key, ['icon', 'color']))
-                                                                    <span class="badge bg-light text-dark me-1 mb-1 d-inline-block">
-                                                                        <span class="fw-bold">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span>
+                                                                    <span
+                                                                        class="badge bg-light text-dark me-1 mb-1 d-inline-block">
+                                                                        <span
+                                                                            class="fw-bold">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span>
                                                                         @if (is_array($value))
                                                                             @if (empty($value))
                                                                                 <em>None</em>
+                                                                            @elseif (is_string($value))
+                                                                                {{-- If it's a string, just display it --}}
+                                                                                {{ ucfirst($value) }}
                                                                             @else
-                                                                                {{ implode(', ', array_map('ucfirst', $value)) }}
+                                                                                {{-- If it's an array, format it nicely --}}
+                                                                                <pre class="text-break"></pre>
+                                                                                {{ json_encode($value, JSON_PRETTY_PRINT) }}
+                                                                                </pre>
                                                                             @endif
                                                                         @elseif(is_bool($value))
                                                                             {{ $value ? 'Yes' : 'No' }}
@@ -84,25 +174,30 @@
                                                         <div class="col-12 col-md-6">
                                                             <div class="mb-2">
                                                                 <strong>Subject:</strong><br>
-                                                                <span class="text-break">{{ $activity->subject_type ?? 'N/A' }}</span>
+                                                                <span
+                                                                    class="text-break">{{ $activity->subject_type ?? 'N/A' }}</span>
                                                             </div>
                                                             <div class="mb-2">
                                                                 <strong>Subject ID:</strong><br>
-                                                                <span class="text-break">{{ $activity->subject_id ?? 'N/A' }}</span>
+                                                                <span
+                                                                    class="text-break">{{ $activity->subject_id ?? 'N/A' }}</span>
                                                             </div>
                                                             <div class="mb-2">
                                                                 <strong>Event:</strong><br>
-                                                                <span class="text-break">{{ $activity->event ?? 'N/A' }}</span>
+                                                                <span
+                                                                    class="text-break">{{ $activity->event ?? 'N/A' }}</span>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 col-md-6">
                                                             <div class="mb-2">
                                                                 <strong>IP Address:</strong><br>
-                                                                <span class="text-break">{{ $activity->properties['ip'] ?? 'N/A' }}</span>
+                                                                <span
+                                                                    class="text-break">{{ $activity->properties['ip'] ?? 'N/A' }}</span>
                                                             </div>
                                                             <div class="mb-2">
                                                                 <strong>User Agent:</strong><br>
-                                                                <span class="text-break small">{{ $activity->properties['user_agent'] ?? 'N/A' }}</span>
+                                                                <span
+                                                                    class="text-break small">{{ $activity->properties['user_agent'] ?? 'N/A' }}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -136,48 +231,8 @@
         </div>
     </div>
 
-    <!-- Activity Statistics Card -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Activity Summary</h6>
-                </div>
-                <div class="card-body p-2 p-md-3">
-                    <div class="row text-center g-2 g-md-3">
-                        <div class="col-6 col-md-3">
-                            <div class="stat-item">
-                                <i class="fas fa-user-edit fa-2x text-primary mb-2"></i>
-                                <h4 class="mb-1">{{ $activities->where('description', 'like', '%profile%')->count() }}</h4>
-                                <small class="text-muted">Profile Updates</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="stat-item">
-                                <i class="fas fa-lock fa-2x text-success mb-2"></i>
-                                <h4 class="mb-1">{{ $activities->where('description', 'like', '%password%')->count() }}</h4>
-                                <small class="text-muted">Security Changes</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="stat-item">
-                                <i class="fas fa-map-marker-alt fa-2x text-info mb-2"></i>
-                                <h4 class="mb-1">{{ $activities->where('description', 'like', '%address%')->count() }}</h4>
-                                <small class="text-muted">Address Changes</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="stat-item">
-                                <i class="fas fa-shopping-cart fa-2x text-warning mb-2"></i>
-                                <h4 class="mb-1">{{ $activities->where('description', 'like', '%order%')->count() }}</h4>
-                                <small class="text-muted">Order Activities</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
 
 @endsection
 
@@ -237,7 +292,8 @@
             border-radius: 8px;
             padding: 12px;
             border-left: 3px solid #007bff;
-            min-width: 0; /* Prevents flex items from overflowing */
+            min-width: 0;
+            /* Prevents flex items from overflowing */
         }
 
         @media (min-width: 768px) {
@@ -335,7 +391,7 @@
                 left: 13px;
             }
 
-            .card-header .d-flex > * {
+            .card-header .d-flex>* {
                 min-width: 0;
             }
         }

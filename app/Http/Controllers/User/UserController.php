@@ -4,8 +4,10 @@ namespace App\Http\Controllers\User;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Models\CustomerAddress;
 use Illuminate\Validation\Rule;
+use App\Models\CustomerActivityLog;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerLoginHistory;
 use App\Models\CustomerNotification;
@@ -14,9 +16,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 use WisdomDiala\Countrypkg\Models\Country;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\CustomerStoreAddressRequest;
+use App\Http\Requests\CustomerUpdateAddressRequest;
+use App\Http\Requests\CustomerChangePasswordRequest;
 
 class UserController extends Controller
 {
+    public function __construct(protected UserService $userService) {}
     /**
      * Display customer dashboard
      */
@@ -47,13 +54,18 @@ class UserController extends Controller
             ->latest()
             ->limit(3)
             ->get();
+        $customActivities = CustomerActivityLog::where('user_id', $user->id)
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return view('user.dashboard', compact(
             'user',
             'recentActivities',
             'notifications',
             'unreadNotifications',
-            'recentLogins'
+            'recentLogins',
+            'customActivities'
         ));
     }
 
@@ -100,13 +112,22 @@ class UserController extends Controller
     public function activityLog()
     {
         $user = Auth::user();
+
+        // Get Spatie activities
         $activities = Activity::where('causer_id', $user->id)
             ->where('causer_type', User::class)
             ->latest()
-            ->paginate(20);
+            ->paginate(10, ['*'], 'spatie_page');
 
-        return view('user.profile.activity', compact('activities'));
+        // Get custom activities`
+        $customActivities = CustomerActivityLog::where('user_id', $user->id)
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        return view('user.profile.activity', compact('activities', 'customActivities'));
     }
+
 
 
     /**
@@ -126,25 +147,13 @@ class UserController extends Controller
     /**
      * Update profile information
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         $user = Auth::user();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'marketing_preferences' => 'nullable|array',
-            'marketing_preferences.*' => 'string|in:email,sms,push,newsletter',
-        ]);
 
+
+        
         $data = $request->only([
             'name',
             'username',
@@ -154,150 +163,50 @@ class UserController extends Controller
             'city',
             'state',
             'postal_code',
-            'country'
+            'country',
+            'marketing_preferences'
         ]);
+        $updatedUser = $this->userService->updateProfile(
+            $user,
+            $data,
+            $request->file('photo')
+        );
 
-        // Handle marketing preferences
-        $data['marketing_preferences'] = $request->input('marketing_preferences', []);
-
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($user->photo && Storage::disk('public')->exists(str_replace('storage/', '', $user->photo))) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $user->photo));
-            }
-
-            $photoPath = $request->file('photo')->store('uploads/customers', 'public');
-            $data['photo'] = 'storage/' . $photoPath;
-        }
-
-        $user->update($data);
-
-        // Log activity
-        activity()
-            ->causedBy($user)
-            ->log('Profile updated');
-
-        return redirect()->route('user.profile')
-            ->with('success', 'Profile updated successfully!');
+        return to_route('user.profile')->with('success', 'Profile updated successfully!');
     }
 
     /**
      * Change password
      */
-    public function changePassword(Request $request)
+    public function changePassword(CustomerChangePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => 'required',
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->current_password && Hash::check($value, Auth::user()->password)) {
-                        $fail('The new password must be different from the current password.');
-                    }
-                },
-            ],
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $user = Auth::user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Current password is incorrect']);
-        }
+        $this->userService->changePassword($user, $request->password);
 
-        $user->update([
-            'password' => Hash::make($request->password)
-        ]);
-
-        // Log activity
-        activity()
-            ->causedBy($user)
-            ->log('Password changed');
-
-        return redirect()->route('user.profile')
-            ->with('success', 'Password changed successfully!');
+        return to_route('user.profile')->with('success', 'Password changed successfully!');
     }
 
     /**
      * Store new address
      */
-    public function storeAddress(Request $request)
+    public function storeAddress(CustomerStoreAddressRequest $request)
     {
-        $request->validate([
-            'address_type' => 'required|in:billing,shipping,both',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'address_line1' => 'required|string|max:255',
-            'address_line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
-            'is_default' => 'boolean',
-        ]);
-
         $user = Auth::user();
 
-        // If this is set as default, remove default from other addresses
-        if ($request->is_default) {
-            $user->addresses()->update(['is_default' => false]);
-        }
+        $address = $this->userService->createAddress($user, $request->validated());
 
-        $address = $user->addresses()->create($request->all());
-
-        // Log activity
-        activity()
-            ->causedBy($user)
-            ->performedOn($address)
-            ->log('New address added');
-
-        return redirect()->route('user.addresses')
-            ->with('success', 'Address added successfully!');
+        return to_route('user.addresses')->with('success', 'Address added successfully!');
     }
 
     /**
      * Update address
      */
-    public function updateAddress(Request $request, CustomerAddress $address)
+    public function updateAddress(CustomerUpdateAddressRequest $request, CustomerAddress $address)
     {
-        // Ensure the address belongs to the authenticated user
-        if ($address->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $updatedAddress = $this->userService->updateAddress($address, $request->validated());
 
-        $request->validate([
-            'address_type' => 'required|in:billing,shipping,both',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'address_line1' => 'required|string|max:255',
-            'address_line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
-            'is_default' => 'boolean',
-        ]);
-
-        // If this is set as default, remove default from other addresses
-        if ($request->is_default) {
-            Auth::user()->addresses()->where('id', '!=', $address->id)->update(['is_default' => false]);
-        }
-
-        $address->update($request->all());
-
-        // Log activity
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($address)
-            ->log('Address updated');
-
-        return redirect()->route('user.addresses')
+        return to_route('user.addresses')
             ->with('success', 'Address updated successfully!');
     }
 
@@ -311,19 +220,12 @@ class UserController extends Controller
             abort(403);
         }
 
-        // Log activity before deletion
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($address)
-            ->log('Address deleted');
+        $this->userService->deleteAddress($address);
 
-        $address->delete();
-
-        return redirect()->route('user.addresses')
-            ->with('success', 'Address deleted successfully!');
+        return to_route('user.addresses')->with('success', 'Address deleted successfully!');
     }
 
-      /**
+    /**
      * Mark notification as read
      */
     public function markNotificationAsRead(CustomerNotification $notification)
@@ -341,11 +243,35 @@ class UserController extends Controller
     /**
      * Mark all notifications as read
      */
+    /**
+     * Mark all notifications as read
+     */
     public function markAllNotificationsAsRead()
     {
         CustomerNotification::where('user_id', Auth::id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
+
+        // Log bulk notification read activity
+        CustomerActivityLog::log(
+            userId: Auth::id(),
+            activityType: 'notifications_bulk_read',
+            description: 'All notifications marked as read',
+            properties: [
+                'event' => 'notifications_bulk_read',
+                'subject_type' => CustomerNotification::class,
+            ]
+        );
+
+        // Spatie activity log
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'event' => 'notifications_bulk_read',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ])
+            ->log('All notifications marked as read');
 
         return redirect()->route('user.notifications')
             ->with('success', 'All notifications marked as read!');
@@ -358,14 +284,39 @@ class UserController extends Controller
      */
     public function logout()
     {
+        $user = Auth::user();
+
+        // Log logout activity before logging out
+        CustomerActivityLog::log(
+            userId: $user->id,
+            activityType: 'user_logout',
+            description: 'User logged out',
+            properties: [
+                'event' => 'user_logout',
+                'subject_type' => User::class,
+                'subject_id' => $user->id,
+            ]
+        );
+
+        // Spatie activity log
+        activity()
+            ->causedBy($user)
+            ->withProperties([
+                'event' => 'user_logout',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ])
+            ->log('User logged out');
+
         Auth::logout();
+
         // Clear the session
         session()->flush();
+
         // Regenerate the session token to prevent session fixation attacks
         session()->regenerateToken();
 
-
-
-        return redirect()->route('login')->with('success', 'You have been logged out successfully.');
+        return redirect()->route('login')
+            ->with('success', 'You have been logged out successfully.');
     }
 }

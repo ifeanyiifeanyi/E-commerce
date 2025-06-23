@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\EnhancedActivityLogging;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, EnhancedActivityLogging;
+
 
 
 
@@ -129,6 +131,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isVendor(): bool
     {
         return $this->role === 'vendor';
+    }
+    public function is_customer(): bool
+    {
+        return $this->role === 'user';
     }
 
     public function isAdmin(): bool
@@ -276,5 +282,43 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $lastOrder->created_at->diffInDays(now());
+    }
+
+    public static function evented(){
+        static::created(function ($user) {
+            activity()
+                ->performedOn($user)
+                ->withProperties([
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'url' => request()->url(),
+                    'method' => request()->method(),
+                ])
+                ->log('User created');
+        });
+
+        static::updated(function ($user) {
+            activity()
+                ->performedOn($user)
+                ->withProperties([
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'url' => request()->url(),
+                    'method' => request()->method(),
+                ])
+                ->log('User updated');
+        });
+
+        static::deleted(function ($user) {
+            activity()
+                ->performedOn($user)
+                ->withProperties([
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'url' => request()->url(),
+                    'method' => request()->method(),
+                ])
+                ->log('User deleted');
+        });
     }
 }

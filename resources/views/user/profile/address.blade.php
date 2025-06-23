@@ -44,7 +44,7 @@
                                                         </button>
                                                     </li>
                                                     <li>
-                                                        <form method="POST" action="{{ route('user.addresses.delete', $address->id) }}" 
+                                                        <form method="POST" action="{{ route('user.addresses.delete', $address->id) }}"
                                                               onsubmit="return confirm('Are you sure you want to delete this address?')">
                                                             @csrf
                                                             @method('DELETE')
@@ -56,14 +56,14 @@
                                                 </ul>
                                             </div>
                                         </div>
-                                        
+
                                         <p class="card-text mb-1">{{ $address->address_line1 }}</p>
                                         @if($address->address_line2)
                                             <p class="card-text mb-1">{{ $address->address_line2 }}</p>
                                         @endif
                                         <p class="card-text mb-1">{{ $address->city }}, {{ $address->state }} {{ $address->postal_code }}</p>
                                         <p class="card-text mb-2">{{ $address->country }}</p>
-                                        
+
                                         @if($address->phone)
                                             <p class="card-text text-muted mb-0">
                                                 <i class="fas fa-phone me-2"></i>{{ $address->phone }}
@@ -119,7 +119,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">First Name *</label>
@@ -130,17 +130,17 @@
                             <input type="text" name="last_name" class="form-control" required>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label">Address Line 1 *</label>
                         <input type="text" name="address_line1" class="form-control" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label">Address Line 2</label>
                         <input type="text" name="address_line2" class="form-control">
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">City *</label>
@@ -155,18 +155,15 @@
                             <input type="text" name="postal_code" class="form-control" required>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Country *</label>
                             <select name="country" class="form-select" required>
                                 <option value="">Select Country</option>
-                                <option value="Nigeria">Nigeria</option>
-                                <option value="Ghana">Ghana</option>
-                                <option value="Kenya">Kenya</option>
-                                <option value="South Africa">South Africa</option>
-                                <option value="United States">United States</option>
-                                <option value="United Kingdom">United Kingdom</option>
+                                @foreach ($countries as $country)
+                                    <option {{ old('country') == $country->name ? 'selected' : '' }} value="{{ $country->name }}">{{ $country->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -215,12 +212,20 @@ function editAddress(addressId) {
     // Find the address data from the rendered addresses
     const addresses = @json($addresses);
     const address = addresses.find(addr => addr.id === addressId);
-    
+    const countries = @json($countries);
+
+     // Build country options dynamically
+    let countryOptions = '<option value="">Select Country</option>';
+    countries.forEach(country => {
+        const selected = address.country === country.name ? 'selected' : '';
+        countryOptions += `<option value="${country.name}" ${selected}>${country.name}</option>`;
+    });
+
     if (!address) return;
-    
+
     // Update form action
     document.getElementById('editAddressForm').action = `/customer/addresses/${addressId}`;
-    
+
     // Populate form fields
     const formBody = document.getElementById('editAddressFormBody');
     formBody.innerHTML = `
@@ -240,7 +245,7 @@ function editAddress(addressId) {
                 </div>
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">First Name *</label>
@@ -251,17 +256,17 @@ function editAddress(addressId) {
                 <input type="text" name="last_name" class="form-control" value="${address.last_name}" required>
             </div>
         </div>
-        
+
         <div class="mb-3">
             <label class="form-label">Address Line 1 *</label>
             <input type="text" name="address_line1" class="form-control" value="${address.address_line1}" required>
         </div>
-        
+
         <div class="mb-3">
             <label class="form-label">Address Line 2</label>
             <input type="text" name="address_line2" class="form-control" value="${address.address_line2 || ''}">
         </div>
-        
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label class="form-label">City *</label>
@@ -276,17 +281,12 @@ function editAddress(addressId) {
                 <input type="text" name="postal_code" class="form-control" value="${address.postal_code}" required>
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Country *</label>
-                <select name="country" class="form-select" required>
-                    <option value="Nigeria" ${address.country === 'Nigeria' ? 'selected' : ''}>Nigeria</option>
-                    <option value="Ghana" ${address.country === 'Ghana' ? 'selected' : ''}>Ghana</option>
-                    <option value="Kenya" ${address.country === 'Kenya' ? 'selected' : ''}>Kenya</option>
-                    <option value="South Africa" ${address.country === 'South Africa' ? 'selected' : ''}>South Africa</option>
-                    <option value="United States" ${address.country === 'United States' ? 'selected' : ''}>United States</option>
-                    <option value="United Kingdom" ${address.country === 'United Kingdom' ? 'selected' : ''}>United Kingdom</option>
+               <select name="country" class="form-select" required>
+                    ${countryOptions}
                 </select>
             </div>
             <div class="col-md-6 mb-3">
@@ -295,7 +295,7 @@ function editAddress(addressId) {
             </div>
         </div>
     `;
-    
+
     // Show modal
     new bootstrap.Modal(document.getElementById('editAddressModal')).show();
 }
